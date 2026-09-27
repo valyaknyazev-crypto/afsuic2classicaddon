@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "CAC",
+    "HBH",
+    "CKC"
+  ],
+  "key": {
+    "C": { "item": "ic2:plate_advanced_alloy" },
+    "A": { "item": "ic2:compressor" },
+    "H": { "item": "ic2:advanced_circuit" },
+    "B": { "item": "ic2:advanced_machine_block" },
+    "K": { "item": "ic2:cutter" }
+  },
+  "result": {
+    "item": "afsu:advanced_assembler",
+    "count": 1
+  }
+}

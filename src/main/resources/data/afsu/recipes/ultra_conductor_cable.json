@@ -1,0 +1,1 @@
+{"type": "minecraft:crafting_shaped", "pattern": ["SSS", "AQA", "SSS"], "key": { "S": { "item": "afsu:super_conductor_cable" }, "A": { "item": "advanced_solars:enriched_sunnarium_alloy" }, "Q": { "item": "afsu:singularity_core" } }, "result": { "item": "afsu:ultra_conductor_cable", "count": 6 } }

@@ -1,0 +1,13 @@
+﻿{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "RDR",
+    "DRD",
+    "RDR"
+  ],
+  "key": {
+    "R": { "item": "minecraft:redstone" },
+    "D": { "item": "ic2:dust_diamond" }
+  },
+  "result": { "item": "afsu:dust_energium", "count": 9 }
+}

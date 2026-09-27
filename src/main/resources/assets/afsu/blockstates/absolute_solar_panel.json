@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "afsu:block/absolute_solar_panel"
+    }
+  }
+}

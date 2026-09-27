@@ -1,0 +1,24 @@
+﻿{
+  "type": "afsu:advanced_assembler",
+  "inputs": [
+    {
+      "ingredient": { "item": "afsu:carbon_sheathing" },
+      "size": 4
+    },
+    {
+      "ingredient": { "item": "ic2:plate_iridium" },
+      "size": 6
+    },
+    {
+      "ingredient": { "item": "afsu:nano_sheathing" },
+      "size": 4
+    },
+    {
+      "ingredient": { "item": "ic2:ingot_uranium" },
+      "size": 4
+    }
+  ],
+  "result": { "item": "afsu:quantum_plating", "count": 1 },
+  "eu_cost": 125,
+  "duration": 600
+}

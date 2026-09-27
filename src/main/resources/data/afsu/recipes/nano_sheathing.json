@@ -1,0 +1,17 @@
+﻿{
+  "type": "afsu:advanced_assembler",
+  "inputs": [
+    {
+      "ingredient": { "item": "afsu:carbon_sheathing" },
+      "size": 2
+    },
+    {
+      "ingredient": { "item": "afsu:dust_energium" },
+      "size": 3
+    }
+  ],
+  "result": { "item": "afsu:nano_sheathing", "count": 1 },
+  "eu_cost": 125,
+  "duration": 400
+}
+

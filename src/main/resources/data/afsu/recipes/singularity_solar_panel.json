@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "GGG",
+    "SQS",
+    "CPC"
+  ],
+  "key": {
+    "G": {
+      "item": "afsu:singularity_glass_pane"
+    },
+    "S": {
+      "item": "afsu:singularity"
+    },
+    "Q": {
+      "item": "afsu:quantum_solar_panel"
+    },
+    "C": {
+      "item": "ic2:pesd"
+    },
+    "P": {
+      "item": "afsu:photon_solar_panel"
+    }
+  },
+  "result": {
+    "item": "afsu:singularity_solar_panel",
+    "count": 1
+  }
+}

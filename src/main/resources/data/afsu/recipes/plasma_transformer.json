@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "TMT",
+    "CAC",
+    "TMT"
+  ],
+  "key": {
+    "T": {
+      "item": "ic2:transformer_adjustable"
+    },
+    "M": {
+      "item": "ic2:stabilized_machine_block"
+    },
+    "C": {
+      "item": "afsu:quantum_circuit"
+    },
+    "A": {
+      "item": "afsu:ufa_item"
+    }
+  },
+  "result": {
+    "item": "afsu:plasma_transformer",
+    "count": 1
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "type": "afsu:advanced_assembler",
+  "inputs": [
+    {
+      "ingredient": {
+        "item": "afsu:carbon_sheathing"
+      },
+      "size": 4
+    },
+    {
+      "ingredient": {
+        "item": "minecraft:redstone"
+      },
+      "size": 3
+    },
+    {
+      "ingredient": {
+        "item": "afsu:hybrid_circuit"
+      },
+      "size": 1
+    },
+    {
+      "ingredient": {
+        "item": "ic2:re_battery"
+      },
+      "size": 1
+    }
+  ],
+  "fluid": {
+    "fluid": "afsu:sulfuric_acid",
+    "amount": 2000
+  },
+  "result": {
+    "item": "afsu:nano_circuit",
+    "count": 1
+  },
+  "eu_cost": 125,
+  "duration": 100
+}

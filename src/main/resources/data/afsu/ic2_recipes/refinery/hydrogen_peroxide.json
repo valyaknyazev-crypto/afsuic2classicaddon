@@ -1,0 +1,24 @@
+{
+  "input": {
+    "type": "ic2:empty"
+  },
+  "first_tank": {
+    "fluid": "minecraft:water",
+    "amount": 1000
+  },
+  "second_tank": {
+    "fluid": "minecraft:empty",
+    "amount": 0
+  },
+  "output": {
+    "type": "ic2:simple",
+    "xp": 0.0,
+    "outputs": [],
+    "fluidOutputs": [
+      {
+        "fluid": "afsu:hydrogen_peroxide",
+        "amount": 500
+      }
+    ]
+  }
+}

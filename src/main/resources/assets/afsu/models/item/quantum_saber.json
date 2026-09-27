@@ -1,0 +1,19 @@
+{
+  "parent": "item/handheld",
+  "textures": {
+    "layer0": "afsu:item/quantum_saber/quantum_saber"
+  },
+  "overrides": [
+    { "predicate": { "afsu:active_frame": 1.0 }, "model": "afsu:item/quantum_saber_active_0" },
+    { "predicate": { "afsu:active_frame": 2.0 }, "model": "afsu:item/quantum_saber_active_1" },
+    { "predicate": { "afsu:active_frame": 3.0 }, "model": "afsu:item/quantum_saber_active_2" },
+    { "predicate": { "afsu:active_frame": 4.0 }, "model": "afsu:item/quantum_saber_active_3" },
+    { "predicate": { "afsu:active_frame": 5.0 }, "model": "afsu:item/quantum_saber_active_4" },
+    { "predicate": { "afsu:active_frame": 6.0 }, "model": "afsu:item/quantum_saber_active_5" },
+    { "predicate": { "afsu:active_frame": 7.0 }, "model": "afsu:item/quantum_saber_active_6" },
+    { "predicate": { "afsu:active_frame": 8.0 }, "model": "afsu:item/quantum_saber_active_7" },
+    { "predicate": { "afsu:active_frame": 9.0 }, "model": "afsu:item/quantum_saber_active_8" },
+    { "predicate": { "afsu:active_frame": 10.0 }, "model": "afsu:item/quantum_saber_active_9" },
+    { "predicate": { "afsu:active_frame": 11.0 }, "model": "afsu:item/quantum_saber_active_10" }
+  ]
+}

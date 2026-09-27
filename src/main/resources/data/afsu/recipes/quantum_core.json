@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "AMA",
+    "IPI",
+    "AMA"
+  ],
+  "key": {
+    "A": {
+      "item": "advanced_solars:sunnarium_alloy"
+    },
+    "M": {
+      "item": "advanced_solars:mt_core"
+    },
+    "I": {
+      "item": "ic2:plate_iridium"
+    },
+    "P": {
+      "item": "ic2:plasma_core"
+    }
+  },
+  "result": {
+    "item": "afsu:quantum_core"
+  }
+}

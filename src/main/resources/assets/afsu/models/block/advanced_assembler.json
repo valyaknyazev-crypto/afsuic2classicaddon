@@ -1,0 +1,12 @@
+{
+  "parent": "block/cube",
+  "textures": {
+    "particle": "afsu:block/advanced_assembler/assembler_front",
+    "down": "afsu:block/advanced_assembler/assembler_bottom",
+    "up": "afsu:block/advanced_assembler/assembler_top",
+    "north": "afsu:block/advanced_assembler/assembler_front",
+    "south": "afsu:block/advanced_assembler/assembler_side",
+    "east": "afsu:block/advanced_assembler/assembler_side",
+    "west": "afsu:block/advanced_assembler/assembler_side"
+  }
+}

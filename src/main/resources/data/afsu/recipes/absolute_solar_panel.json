@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "GGG",
+    "CPC",
+    "ASA"
+  ],
+  "key": {
+    "G": {
+      "item": "afsu:absolute_glass_pane"
+    },
+    "C": {
+      "item": "afsu:absolute_core"
+    },
+    "P": {
+      "item": "afsu:photon_solar_panel"
+    },
+    "A": {
+      "item": "afsu:absolute_sonnarium_alloy"
+    },
+    "S": {
+      "item": "afsu:singularity_solar_panel"
+    }
+  },
+  "result": {
+    "item": "afsu:absolute_solar_panel",
+    "count": 1
+  }
+}

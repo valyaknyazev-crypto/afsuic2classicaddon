@@ -1,0 +1,38 @@
+{
+  "type": "afsu:advanced_assembler",
+  "inputs": [
+    {
+      "ingredient": {
+        "item": "ic2:advanced_circuit"
+      },
+      "size": 1
+    },
+    {
+      "ingredient": {
+        "item": "ic2:dust_aluminium"
+      },
+      "size": 3
+    },
+    {
+      "ingredient": [
+        {
+          "item": "ic2:dust_hydrated_coal"
+        },
+        {
+          "item": "ic2:dust_hydrated_charcoal"
+        }
+      ],
+      "size": 2
+    }
+  ],
+  "fluid": {
+    "fluid": "afsu:sulfuric_acid",
+    "amount": 2000
+  },
+  "result": {
+    "item": "afsu:hybrid_circuit",
+    "count": 1
+  },
+  "eu_cost": 150,
+  "duration": 150
+}

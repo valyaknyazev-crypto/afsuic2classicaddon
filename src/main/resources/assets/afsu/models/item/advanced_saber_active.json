@@ -1,0 +1,7 @@
+{
+  "parent": "item/handheld",
+  "textures": {
+    "layer0": "afsu:item/advanced_saber/advanced_saber",
+    "layer1": "afsu:item/advanced_saber/advanced_saber_active"
+  }
+}

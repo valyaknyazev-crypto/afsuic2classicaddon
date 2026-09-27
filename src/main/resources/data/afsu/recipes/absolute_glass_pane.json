@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "RRR",
+    "ACA",
+    "RRR"
+  ],
+  "key": {
+    "R": {
+      "item": "ic2:reinforced_glass"
+    },
+    "A": {
+      "item": "afsu:absolute_sonnarium_alloy"
+    },
+    "C": {
+      "item": "afsu:absolute_core"
+    }
+  },
+  "result": {
+    "item": "afsu:absolute_glass_pane",
+    "count": 6
+  }
+}

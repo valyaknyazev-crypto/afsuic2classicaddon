@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "afsu:block/photon_solar_panel"
+    }
+  }
+}

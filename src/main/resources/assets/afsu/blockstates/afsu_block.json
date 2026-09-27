@@ -1,0 +1,27 @@
+{
+  "variants": {
+    "facing=down": {
+      "model": "afsu:block/afsu_block",
+      "x": -90
+    },
+    "facing=up": {
+      "model": "afsu:block/afsu_block",
+      "x": 90
+    },
+    "facing=north": {
+      "model": "afsu:block/afsu_block",
+      "y": 180
+    },
+    "facing=south": {
+      "model": "afsu:block/afsu_block"
+    },
+    "facing=west": {
+      "model": "afsu:block/afsu_block",
+      "y": 90
+    },
+    "facing=east": {
+      "model": "afsu:block/afsu_block",
+      "y": 270
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "parent": "minecraft:block/orientable",
+  "textures": {
+    "top": "afsu:block/plasma_transformer/active_up",
+    "bottom": "afsu:block/plasma_transformer/active_down",
+    "front": "afsu:block/plasma_transformer/active_south",
+    "side": "afsu:block/plasma_transformer/active_north",
+    "particle": "afsu:block/plasma_transformer/active_south"
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "type": "afsu:advanced_assembler",
+  "inputs": [
+    {
+      "ingredient": {
+        "item": "ic2:heat_exchanger_advanced"
+      },
+      "size": 3
+    },
+    {
+      "ingredient": {
+        "item": "ic2:plasma_core"
+      },
+      "size": 1
+    },
+    {
+      "ingredient": {
+        "item": "ic2:reflector_iridium"
+      },
+      "size": 1
+    },
+    {
+      "ingredient": {
+        "item": "afsu:nano_circuit"
+      },
+      "size": 1
+    }
+  ],
+  "fluid": {
+    "fluid": "afsu:sulfuric_acid",
+    "amount": 2000
+  },
+  "result": {
+    "item": "afsu:quantum_circuit",
+    "count": 1
+  },
+  "eu_cost": 125,
+  "duration": 150
+}

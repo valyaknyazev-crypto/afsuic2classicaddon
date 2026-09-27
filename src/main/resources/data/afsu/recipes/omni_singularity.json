@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "CCC",
+    "CCC",
+    "CCC"
+  ],
+  "key": {
+    "C": {
+      "item": "afsu:chunk_of_absolute_singularity"
+    }
+  },
+  "result": {
+    "item": "afsu:omni_singularity",
+    "count": 1
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "parent": "item/handheld",
+  "textures": {
+    "layer0": "afsu:item/quantum_saber/quantum_saber_active_0"
+  }
+}

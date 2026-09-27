@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "OOO",
+    "OSO",
+    "OOO"
+  ],
+  "key": {
+    "O": {
+      "item": "afsu:omni_singularity"
+    },
+    "S": {
+      "item": "afsu:singularity_core"
+    }
+  },
+  "result": {
+    "item": "afsu:absolute_core",
+    "count": 1
+  }
+}

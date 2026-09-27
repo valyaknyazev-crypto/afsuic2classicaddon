@@ -1,0 +1,26 @@
+{
+  "input": {
+    "type": "ic2:item",
+    "item": "afsu:dust_sulfur",
+    "size": 1
+  },
+  "first_tank": {
+    "fluid": "afsu:hydrogen_peroxide",
+    "amount": 1000
+  },
+  "second_tank": {
+    "fluid": "minecraft:empty",
+    "amount": 0
+  },
+  "output": {
+    "type": "ic2:simple",
+    "xp": 0.0,
+    "outputs": [],
+    "fluidOutputs": [
+      {
+        "fluid": "afsu:sulfuric_acid",
+        "amount": 1000
+      }
+    ]
+  }
+}

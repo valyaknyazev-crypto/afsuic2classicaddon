@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "CAC",
+    "CUC",
+    "CBC"
+  ],
+  "key": {
+    "C": {
+      "item": "afsu:ufa_item"
+    },
+    "A": {
+      "item": "ic2:plate_iridium"
+    },
+    "U": {
+      "item": "ic2:isu"
+    },
+    "B": {
+      "item": "ic2:colossal_base_block"
+    }
+  },
+  "result": {
+    "item": "afsu:afsu_block"
+  }
+}

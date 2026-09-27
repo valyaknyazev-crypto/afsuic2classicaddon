@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "QCQ",
+    "QAQ",
+    " L "
+  ],
+  "key": {
+    "Q": { "item": "afsu:quantum_plating" },
+    "C": { "item": "afsu:quantum_circuit" },
+    "A": { "item": "afsu:advanced_saber" },
+    "L": { "item": "afsu:dense_lapis_plate" }
+  },
+  "result": {
+    "item": "afsu:quantum_saber",
+    "count": 1
+  }
+}

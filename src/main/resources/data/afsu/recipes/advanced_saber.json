@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "NCN",
+    "NSN",
+    " R "
+  ],
+  "key": {
+    "N": { "item": "afsu:nano_sheathing" },
+    "C": { "item": "afsu:nano_circuit" },
+    "S": { "item": "ic2:nano_saber" },
+    "R": { "item": "afsu:dust_energium" }
+  },
+  "result": {
+    "item": "afsu:advanced_saber",
+    "count": 1
+  }
+}

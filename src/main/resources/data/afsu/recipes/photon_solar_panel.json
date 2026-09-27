@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "GGG",
+    "PUP",
+    "EQE"
+  ],
+  "key": {
+    "G": {
+      "item": "afsu:photon_glass_pane"
+    },
+    "P": {
+      "item": "afsu:photon"
+    },
+    "U": {
+      "item": "advanced_solars:ultimate_hybrid_solar_panel"
+    },
+    "E": {
+      "item": "advanced_solars:enriched_sunnarium_alloy"
+    },
+    "Q": {
+      "item": "afsu:quantum_solar_panel"
+    }
+  },
+  "result": {
+    "item": "afsu:photon_solar_panel",
+    "count": 1
+  }
+}

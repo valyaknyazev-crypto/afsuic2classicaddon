@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "RRR",
+    "PGP",
+    "RRR"
+  ],
+  "key": {
+    "R": {
+      "item": "ic2:reinforced_glass"
+    },
+    "P": {
+      "item": "afsu:photon"
+    },
+    "G": {
+      "item": "minecraft:glowstone_dust"
+    }
+  },
+  "result": {
+    "item": "afsu:photon_glass_pane",
+    "count": 6
+  }
+}

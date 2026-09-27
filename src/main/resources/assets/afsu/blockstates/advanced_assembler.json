@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "active=false,facing=north": { "model": "afsu:block/advanced_assembler" },
+    "active=false,facing=south": { "model": "afsu:block/advanced_assembler", "y": 180 },
+    "active=false,facing=west": { "model": "afsu:block/advanced_assembler", "y": 270 },
+    "active=false,facing=east": { "model": "afsu:block/advanced_assembler", "y": 90 },
+    "active=false,facing=up": { "model": "afsu:block/advanced_assembler", "x": 270 },
+    "active=false,facing=down": { "model": "afsu:block/advanced_assembler", "x": 90 },
+    "active=true,facing=north": { "model": "afsu:block/advanced_assembler_active" },
+    "active=true,facing=south": { "model": "afsu:block/advanced_assembler_active", "y": 180 },
+    "active=true,facing=west": { "model": "afsu:block/advanced_assembler_active", "y": 270 },
+    "active=true,facing=east": { "model": "afsu:block/advanced_assembler_active", "y": 90 },
+    "active=true,facing=up": { "model": "afsu:block/advanced_assembler_active", "x": 270 },
+    "active=true,facing=down": { "model": "afsu:block/advanced_assembler_active", "x": 90 }
+  }
+}

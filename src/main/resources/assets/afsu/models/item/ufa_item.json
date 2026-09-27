@@ -1,0 +1,13 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "afsu:item/ufa_item_0"
+  },
+  "overrides": [
+    { "predicate": { "afsu:charge": 0.0 }, "model": "afsu:item/ufa_item_0" },
+    { "predicate": { "afsu:charge": 0.25 }, "model": "afsu:item/ufa_item_1" },
+    { "predicate": { "afsu:charge": 0.50 }, "model": "afsu:item/ufa_item_2" },
+    { "predicate": { "afsu:charge": 0.75 }, "model": "afsu:item/ufa_item_3" },
+    { "predicate": { "afsu:charge": 1.0 }, "model": "afsu:item/ufa_item_4" }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " H ",
+    "QUQ",
+    "ECE"
+  ],
+  "key": {
+    "H": {
+      "item": "advanced_solars:hybrid_solar_panel"
+    },
+    "U": {
+      "item": "advanced_solars:ultimate_hybrid_solar_panel"
+    },
+    "Q": {
+      "item": "afsu:quantum_core"
+    },
+    "E": {
+      "item": "advanced_solars:enriched_sunnarium_alloy"
+    },
+    "C": {
+      "item": "afsu:hyper_dense_carbon"
+    }
+  },
+  "result": {
+    "item": "afsu:quantum_solar_panel"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "CAC",
+    "IUI",
+    "CAC"
+  ],
+  "key": {
+    "C": {
+      "item": "ic2:carbon_plate"
+    },
+    "A": {
+      "item": "ic2:plate_advanced_alloy"
+    },
+    "I": {
+      "item": "ic2:plate_iridium"
+    },
+    "U": {
+      "item": "ic2:uesc"
+    }
+  },
+  "result": {
+    "item": "afsu:ufa_item"
+  }
+}

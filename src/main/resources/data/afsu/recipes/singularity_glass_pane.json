@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "RRR",
+    "SUS",
+    "RRR"
+  ],
+  "key": {
+    "R": {
+      "item": "ic2:reinforced_glass"
+    },
+    "S": {
+      "item": "afsu:singularity"
+    },
+    "U": {
+      "item": "advanced_solars:sunnarium"
+    }
+  },
+  "result": {
+    "item": "afsu:singularity_glass_pane",
+    "count": 6
+  }
+}

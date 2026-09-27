@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "SSS",
+    "AQA",
+    "SSS"
+  ],
+  "key": {
+    "S": {
+      "item": "gravisuit:super_conductor"
+    },
+    "A": {
+      "item": "advanced_solars:sunnarium_alloy"
+    },
+    "Q": {
+      "item": "afsu:quantum_core"
+    }
+  },
+  "result": {
+    "item": "afsu:super_conductor_cable",
+    "count": 6
+  }
+}

@@ -1,0 +1,12 @@
+﻿{
+  "type": "afsu:advanced_assembler",
+  "inputs": [
+    {
+      "ingredient": { "item": "ic2:carbon_plate" },
+      "size": 2
+    }
+  ],
+  "result": { "item": "afsu:carbon_sheathing", "count": 1 },
+  "eu_cost": 125,
+  "duration": 200
+}
