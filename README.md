@@ -1,27 +1,3 @@
-# AFSU: IC2 Classic Addon ⚡
-
-Это эндгейм-аддон для IC2 Classic (1.19.2), который я сделал, потому что на поздних этапах игры отчаянно не хватало нормального хранилища для энергии и более мощной генерации.
-
-### ✨ Что внутри:
-* **AFSU (Advanced Flux Storage Unit):** Сверхёмкое хранилище для накопления миллиардов EU.
-* **Новые солнечные панели:** Квантовая, Фотонная, Сингулярная и Абсолютная. Крафт хардкорный и дорогой, но генерация того стоит.
-* **Advanced Assembler и Plasma Transformer:** Новые механизмы для крафта топовых вещей и работы с экстремальным напряжением.
-* **Сверхпроводники и оружие:** Новые кабели, чтобы сеть не плавилась от огромного тока, плюс парочка новых энергетических мечей (Advanced и Quantum Saber).
-
-### ⚙️ Зависимости
-* Minecraft Forge 1.19.2
-* [IC2 Classic](https://modrinth.com/mod/ic2-classic)
-* Advanced Solars Classic
-
-### 🛠️ Как собрать мод самому
-Если хотите скомпилировать мод из этих исходников, вам понадобится Java 17. Просто введите в консоли:
-```bash
-./gradlew build
-```
-Готовый мод появится в папке `build/libs`.
-
----
-
 # 🇬🇧 English
 
 This is an endgame addon for IC2 Classic (1.19.2) created because the late game desperately lacked proper extreme energy storage and more powerful EU generation.
@@ -43,3 +19,27 @@ To compile the mod yourself (requires Java 17), just run:
 ./gradlew build
 ```
 The compiled `.jar` file will be in the `build/libs` folder.
+
+---
+
+# AFSU: IC2 Classic Addon ⚡
+
+Это эндгейм-аддон для IC2 Classic (1.19.2), который я сделал, потому что на поздних этапах игры отчаянно не хватало нормального хранилища для энергии и более мощной генерации.
+
+### ✨ Что внутри:
+* **AFSU (Advanced Flux Storage Unit):** Сверхёмкое хранилище для накопления миллиардов EU.
+* **Новые солнечные панели:** Квантовая, Фотонная, Сингулярная и Абсолютная. Крафт хардкорный и дорогой, но генерация того стоит.
+* **Advanced Assembler и Plasma Transformer:** Новые механизмы для крафта топовых вещей и работы с экстремальным напряжением.
+* **Сверхпроводники и оружие:** Новые кабели, чтобы сеть не плавилась от огромного тока, плюс парочка новых энергетических мечей (Advanced и Quantum Saber).
+
+### ⚙️ Зависимости
+* Minecraft Forge 1.19.2
+* [IC2 Classic](https://modrinth.com/mod/ic2-classic)
+* Advanced Solars Classic
+
+### 🛠️ Как собрать мод самому
+Если хотите скомпилировать мод из этих исходников, вам понадобится Java 17. Просто введите в консоли:
+```bash
+./gradlew build
+```
+Готовый мод появится в папке `build/libs`.
