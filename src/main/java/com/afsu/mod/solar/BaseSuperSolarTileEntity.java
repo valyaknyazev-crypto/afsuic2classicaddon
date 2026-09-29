@@ -98,6 +98,16 @@ public abstract class BaseSuperSolarTileEntity extends BaseGeneratorTileEntity i
     }
     
     @Override
+    public int getMaxEU() {
+        return this.maxStorage;
+    }
+    
+    @Override
+    public int getStoredEU() {
+        return this.storage;
+    }
+    
+    @Override
     public void consumeEnergy(int amount) {
         super.consumeEnergy(amount);
         this.emittedThisTick += amount;
