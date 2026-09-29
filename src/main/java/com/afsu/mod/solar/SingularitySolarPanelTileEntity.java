@@ -7,7 +7,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class SingularitySolarPanelTileEntity extends BaseSuperSolarTileEntity {
     public SingularitySolarPanelTileEntity(BlockPos pos, BlockState state) {
-        super(pos, state, 16384, 8_192_000, 7); 
+        super(pos, state, 16384, 8192000, 7); 
     }
     
     @Override

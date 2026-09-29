@@ -7,7 +7,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class QuantumSolarPanelTileEntity extends BaseSuperSolarTileEntity {
     public QuantumSolarPanelTileEntity(BlockPos pos, BlockState state) {
-        super(pos, state, 4096, 2_048_000, 5); // tier 5 is max
+        super(pos, state, 4096, 2048000, 5); // tier 5 is max
     }
     
     @Override
