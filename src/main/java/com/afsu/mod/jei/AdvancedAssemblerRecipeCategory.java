@@ -38,7 +38,7 @@ public class AdvancedAssemblerRecipeCategory implements IRecipeCategory<Advanced
         
         // Crop the actual machine GUI texture! X: 24->154, Y: 11->76 (Width: 130, Height: 65)
         this.background = guiHelper.createDrawable(guiTexture, 24, 11, 127, 65);
-        this.icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(AFSUMod.ADVANCED_ASSEMBLER.get()));
+        this.icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(com.afsu.mod.registry.AFSUBlocks.ADVANCED_ASSEMBLER.get()));
         
         IDrawableStatic arrowStatic = guiHelper.createDrawable(guiTexture, 176, 15, 24, 16);
         this.arrow = guiHelper.createAnimatedDrawable(arrowStatic, 100, IDrawableAnimated.StartDirection.LEFT, false);

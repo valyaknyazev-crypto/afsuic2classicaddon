@@ -11,6 +11,7 @@ public class AFSUJadePlugin implements IWailaPlugin {
 
     @Override
     public void register(IWailaCommonRegistration registration) {
+        registration.registerBlockDataProvider(AssemblerProvider.INSTANCE, com.afsu.mod.assembler.AdvancedAssemblerTileEntity.class);
     }
 
     @Override

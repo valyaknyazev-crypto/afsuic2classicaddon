@@ -7,12 +7,12 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class AbsoluteSolarPanelTileEntity extends BaseSuperSolarTileEntity {
     public AbsoluteSolarPanelTileEntity(BlockPos pos, BlockState state) {
-        super(pos, state, 65536, 2_000_000_000, 8); 
+        super(pos, state, 65536, 32_768_000, 8); 
     }
     
     @Override
     public BlockEntityType<?> createType() {
-        return AFSUMod.ABSOLUTE_SOLAR_PANEL_ENTITY.get();
+        return com.afsu.mod.registry.AFSUBlockEntities.ABSOLUTE_SOLAR_PANEL_ENTITY.get();
     }
 }
 

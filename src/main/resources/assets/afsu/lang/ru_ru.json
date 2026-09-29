@@ -1,4 +1,4 @@
-﻿{
+{
   "block.afsu.afsu_block": "AFSU",
   "item.afsu.afsu_block": "AFSU",
   "item.afsu.ufa_item": "UFA",
@@ -57,5 +57,6 @@
   "gui.afsu.jade.packets": "Пакеты: %s",
   "gui.afsu.jade.packet_size": "Размер пакета: %s EU",
   "gui.afsu.jade.speed": "Скорость: %sx",
-  "gui.afsu.jade.energy_demand": "Потребление энергии: %sx"
+  "gui.afsu.jade.energy_demand": "Потребление энергии: %sx",
+  "gui.afsu.jade.progress": "Прогресс: %s / %st"
 }

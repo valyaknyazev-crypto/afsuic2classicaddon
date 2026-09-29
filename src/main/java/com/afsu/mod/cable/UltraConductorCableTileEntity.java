@@ -12,7 +12,7 @@ public class UltraConductorCableTileEntity extends BlockEntity implements IEnerg
     private boolean addedToEnet = false;
     
     public UltraConductorCableTileEntity(BlockPos pos, BlockState state) {
-        super(com.afsu.mod.AFSUMod.ULTRA_CONDUCTOR_CABLE_ENTITY.get(), pos, state);
+        super(com.afsu.mod.registry.AFSUBlockEntities.ULTRA_CONDUCTOR_CABLE_ENTITY.get(), pos, state);
     }
     
     @Override

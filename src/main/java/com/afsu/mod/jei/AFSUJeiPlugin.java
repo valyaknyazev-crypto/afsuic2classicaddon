@@ -41,18 +41,18 @@ public class AFSUJeiPlugin implements IModPlugin {
     public void registerRecipes(IRecipeRegistration registration) {
         RecipeManager recipeManager = Minecraft.getInstance().level.getRecipeManager();
         
-        List<AdvancedAssemblerRecipe> recipes = recipeManager.getAllRecipesFor((net.minecraft.world.item.crafting.RecipeType<AdvancedAssemblerRecipe>) AFSUMod.ADVANCED_ASSEMBLER_TYPE.get());
+        List<AdvancedAssemblerRecipe> recipes = recipeManager.getAllRecipesFor((net.minecraft.world.item.crafting.RecipeType<AdvancedAssemblerRecipe>) com.afsu.mod.registry.AFSURecipes.ADVANCED_ASSEMBLER_TYPE.get());
         registration.addRecipes(AdvancedAssemblerRecipeCategory.TYPE, recipes);
     }
 
     @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
-        registration.addRecipeCatalyst(new ItemStack(AFSUMod.ADVANCED_ASSEMBLER.get()), AdvancedAssemblerRecipeCategory.TYPE);
+        registration.addRecipeCatalyst(new ItemStack(com.afsu.mod.registry.AFSUBlocks.ADVANCED_ASSEMBLER.get()), AdvancedAssemblerRecipeCategory.TYPE);
     }
 
     @Override
     public void registerRecipeTransferHandlers(IRecipeTransferRegistration registration) {
-        registration.addRecipeTransferHandler(AdvancedAssemblerContainer.class, AFSUMod.ADVANCED_ASSEMBLER_MENU.get(), AdvancedAssemblerRecipeCategory.TYPE, 2, 6, 16, 36);
+        registration.addRecipeTransferHandler(AdvancedAssemblerContainer.class, com.afsu.mod.registry.AFSUMenus.ADVANCED_ASSEMBLER_MENU.get(), AdvancedAssemblerRecipeCategory.TYPE, 2, 6, 16, 36);
     }
 }
 

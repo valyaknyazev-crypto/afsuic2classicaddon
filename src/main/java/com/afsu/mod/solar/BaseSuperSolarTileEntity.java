@@ -49,7 +49,7 @@ public abstract class BaseSuperSolarTileEntity extends BaseGeneratorTileEntity i
         super(pos, state, tier);
         this.maxOutput = generation;
         this.production = generation / 2;
-        this.lowerProduction = this.production / 16;
+        this.lowerProduction = this.production / 8;
         this.maxStorage = maxStorage;
         this.tier = tier;
         this.addComparator(ic2.core.block.base.misc.comparator.types.base.FlagComparator.createTile("active", ic2.core.block.base.misc.comparator.ComparatorNames.ACTIVE, this));

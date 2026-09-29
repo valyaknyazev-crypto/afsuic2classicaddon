@@ -12,7 +12,7 @@ public class SuperConductorCableTileEntity extends BlockEntity implements IEnerg
     private boolean addedToEnet = false;
     
     public SuperConductorCableTileEntity(BlockPos pos, BlockState state) {
-        super(com.afsu.mod.AFSUMod.SUPER_CONDUCTOR_CABLE_ENTITY.get(), pos, state);
+        super(com.afsu.mod.registry.AFSUBlockEntities.SUPER_CONDUCTOR_CABLE_ENTITY.get(), pos, state);
     }
     
     @Override
@@ -59,7 +59,7 @@ public class SuperConductorCableTileEntity extends BlockEntity implements IEnerg
 
     @Override
     public int getConductorBreakdownEnergy() {
-        return 524289; 
+        return 16384; 
     }
 
     @Override

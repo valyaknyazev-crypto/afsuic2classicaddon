@@ -12,7 +12,7 @@ public class AbsoluteCableTileEntity extends BlockEntity implements IEnergyCondu
     private boolean addedToEnet = false;
     
     public AbsoluteCableTileEntity(BlockPos pos, BlockState state) {
-        super(com.afsu.mod.AFSUMod.ABSOLUTE_CABLE_ENTITY.get(), pos, state);
+        super(com.afsu.mod.registry.AFSUBlockEntities.ABSOLUTE_CABLE_ENTITY.get(), pos, state);
     }
     
     @Override
@@ -59,7 +59,7 @@ public class AbsoluteCableTileEntity extends BlockEntity implements IEnergyCondu
 
     @Override
     public int getConductorBreakdownEnergy() {
-        return 2147483647; 
+        return 131072; 
     }
 
     @Override

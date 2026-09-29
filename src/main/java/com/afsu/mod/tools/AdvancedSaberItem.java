@@ -109,11 +109,11 @@ public class AdvancedSaberItem extends SwordItem implements IElectricItem {
     private static final Multimap<Attribute, AttributeModifier> INACTIVE_MODIFIERS;
     static {
         Multimap<Attribute, AttributeModifier> active = HashMultimap.create();
-        active.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Weapon modifier", 30.0, AttributeModifier.Operation.ADDITION));
+        active.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Weapon modifier", 29.0, AttributeModifier.Operation.ADDITION));
         active.put(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID, "Weapon modifier", -2.4, AttributeModifier.Operation.ADDITION));
         ACTIVE_MODIFIERS = active;
         Multimap<Attribute, AttributeModifier> inactive = HashMultimap.create();
-        inactive.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Weapon modifier", 4.0, AttributeModifier.Operation.ADDITION));
+        inactive.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Weapon modifier", 3.0, AttributeModifier.Operation.ADDITION));
         inactive.put(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID, "Weapon modifier", -2.4, AttributeModifier.Operation.ADDITION));
         INACTIVE_MODIFIERS = inactive;
     }

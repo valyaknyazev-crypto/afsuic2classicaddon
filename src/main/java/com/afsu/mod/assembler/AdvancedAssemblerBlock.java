@@ -46,7 +46,7 @@ public class AdvancedAssemblerBlock extends IC2ContainerBlock {
     
     @Override
     public <T extends BlockEntity> net.minecraft.world.level.block.entity.BlockEntityTicker<T> getTicker(net.minecraft.world.level.Level level, BlockState state, net.minecraft.world.level.block.entity.BlockEntityType<T> type) {
-        return type == com.afsu.mod.AFSUMod.ADVANCED_ASSEMBLER_ENTITY.get() ?
+        return type == com.afsu.mod.registry.AFSUBlockEntities.ADVANCED_ASSEMBLER_ENTITY.get() ?
                 (lvl, pos, blockState, t) -> ((AdvancedAssemblerTileEntity) t).tick() : null;
     }
 }
