@@ -25,8 +25,8 @@ public class AFSUItems {
     public static final RegistryObject<Item> ABSOLUTE_CORE = ITEMS.register("absolute_core", () -> new Item(new Item.Properties().tab(AFSUMod.AFSU_TAB)));
     public static final RegistryObject<Item> ABSOLUTE_SONNARIUM_ALLOY = ITEMS.register("absolute_sonnarium_alloy", () -> new Item(new Item.Properties().tab(AFSUMod.AFSU_TAB)));
     public static final RegistryObject<Item> HYPER_DENSE_CARBON = ITEMS.register("hyper_dense_carbon", () -> new Item(new Item.Properties().tab(AFSUMod.AFSU_TAB)));
-    public static final RegistryObject<Item> ADVANCED_SABER = ITEMS.register("advanced_saber", () -> new com.afsu.mod.tools.ElectricSaberItem(new Item.Properties().tab(AFSUMod.AFSU_TAB).stacksTo(1), 360000, 8192, 1, 10, 400, 30.0, 4.0));
-    public static final RegistryObject<Item> QUANTUM_SABER = ITEMS.register("quantum_saber", () -> new com.afsu.mod.tools.ElectricSaberItem(new Item.Properties().tab(AFSUMod.AFSU_TAB).stacksTo(1), 1000000, 8192, 1, 25, 800, 67.0, 7.0));
+    public static final RegistryObject<Item> ADVANCED_SABER = ITEMS.register("advanced_saber", () -> new com.afsu.mod.tools.ElectricSaberItem(new Item.Properties().tab(AFSUMod.AFSU_TAB).stacksTo(1), 360000, 8192, 1, 10, 400, 29.0, 4.0));
+    public static final RegistryObject<Item> QUANTUM_SABER = ITEMS.register("quantum_saber", () -> new com.afsu.mod.tools.ElectricSaberItem(new Item.Properties().tab(AFSUMod.AFSU_TAB).stacksTo(1), 1000000, 8192, 1, 25, 800, 66.0, 7.0));
     public static final RegistryObject<Item> DUST_SULFUR = ITEMS.register("dust_sulfur", () -> new Item(new Item.Properties().tab(AFSUMod.AFSU_TAB)));
     public static final RegistryObject<Item> SINGULARITY_GLASS_PANE = ITEMS.register("singularity_glass_pane", () -> new Item(new Item.Properties().tab(AFSUMod.AFSU_TAB)));
     public static final RegistryObject<Item> QUANTUM_CIRCUIT = ITEMS.register("quantum_circuit", () -> new Item(new Item.Properties().tab(AFSUMod.AFSU_TAB)));
