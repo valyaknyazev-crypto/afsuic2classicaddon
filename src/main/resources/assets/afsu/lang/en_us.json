@@ -58,5 +58,7 @@
   "gui.afsu.jade.packet_size": "Packet Size: %s EU",
   "gui.afsu.jade.speed": "Speed: %sx",
   "gui.afsu.jade.energy_demand": "Energy Demand: %sx",
-  "gui.afsu.jade.progress": "Progress: %s / %st"
+  "gui.afsu.jade.progress": "Progress: %s / %st",
+  "gui.afsu.jade.cable.conductor": "Conductor Breakdown: %s EU/t",
+  "gui.afsu.jade.cable.insulation": "Insulation Breakdown: %s EU/t"
 }

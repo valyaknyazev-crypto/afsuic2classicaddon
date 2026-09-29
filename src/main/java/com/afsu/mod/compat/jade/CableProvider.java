@@ -16,8 +16,8 @@ public enum CableProvider implements IBlockComponentProvider {
     @Override
     public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
         if (accessor.getBlockEntity() instanceof IEnergyConductor tile) {
-            tooltip.add(Component.literal("Conductor Breakdown: " + tile.getConductorBreakdownEnergy() + " EU/t"));
-            tooltip.add(Component.literal("Insulation Breakdown: " + tile.getInsulationBreakdownEnergy() + " EU/t"));
+            tooltip.add(Component.translatable("gui.afsu.jade.cable.conductor", tile.getConductorBreakdownEnergy()));
+            tooltip.add(Component.translatable("gui.afsu.jade.cable.insulation", tile.getInsulationBreakdownEnergy()));
         }
     }
 

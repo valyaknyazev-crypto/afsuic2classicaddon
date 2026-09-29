@@ -58,5 +58,7 @@
   "gui.afsu.jade.packet_size": "Размер пакета: %s EU",
   "gui.afsu.jade.speed": "Скорость: %sx",
   "gui.afsu.jade.energy_demand": "Потребление энергии: %sx",
-  "gui.afsu.jade.progress": "Прогресс: %s / %st"
+  "gui.afsu.jade.progress": "Прогресс: %s / %st",
+  "gui.afsu.jade.cable.conductor": "Предел проводника: %s EU/t",
+  "gui.afsu.jade.cable.insulation": "Предел изоляции: %s EU/t"
 }
