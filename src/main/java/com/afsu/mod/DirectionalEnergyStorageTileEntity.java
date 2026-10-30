@@ -2,7 +2,6 @@ package com.afsu.mod;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
@@ -12,6 +11,14 @@ public abstract class DirectionalEnergyStorageTileEntity extends BaseEnergyStora
 
     public DirectionalEnergyStorageTileEntity(BlockPos pos, BlockState state, int tier, int output, int capacity) {
         super(pos, state, tier, output, capacity);
+    }
+
+    @Override
+    public void onLoaded() {
+        if (this.hasLevel() && this.getBlockState().hasProperty(BlockStateProperties.FACING)) {
+            this.setFacingSilent(this.getBlockState().getValue(BlockStateProperties.FACING));
+        }
+        super.onLoaded();
     }
 
     @Override

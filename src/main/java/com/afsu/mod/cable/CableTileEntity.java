@@ -32,31 +32,35 @@ public class CableTileEntity extends BlockEntity implements IEnergyConductor, co
         this.conductorBreakdownEnergy = conductorBreakdownEnergy;
     }
     
+    public boolean isSimulating() {
+        return this.level != null && !this.level.isClientSide;
+    }
+    
     @Override
     public void onLoad() {
         super.onLoad();
-        if (!level.isClientSide && !addedToEnet) {
+        if (this.isSimulating() && !this.addedToEnet) {
             EnergyNet.INSTANCE.addTile(this);
-            addedToEnet = true;
+            this.addedToEnet = true;
         }
     }
     
     @Override
     public void setRemoved() {
-        super.setRemoved();
-        if (!level.isClientSide && addedToEnet) {
+        if (this.isSimulating() && this.addedToEnet) {
             EnergyNet.INSTANCE.removeTile(this);
-            addedToEnet = false;
+            this.addedToEnet = false;
         }
+        super.setRemoved();
     }
     
     @Override
     public void onChunkUnloaded() {
-        super.onChunkUnloaded();
-        if (!level.isClientSide && addedToEnet) {
+        if (this.isSimulating() && this.addedToEnet) {
             EnergyNet.INSTANCE.removeTile(this);
-            addedToEnet = false;
+            this.addedToEnet = false;
         }
+        super.onChunkUnloaded();
     }
 
     @Override
@@ -85,8 +89,8 @@ public class CableTileEntity extends BlockEntity implements IEnergyConductor, co
 
     @Override
     public void removeConductor() {
-        if (!level.isClientSide) {
-            level.destroyBlock(worldPosition, true);
+        if (this.isSimulating()) {
+            this.level.destroyBlock(this.worldPosition, false); // Overload melts the cable, no drop
         }
     }
 

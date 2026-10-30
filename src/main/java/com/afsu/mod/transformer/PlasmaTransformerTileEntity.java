@@ -1,15 +1,15 @@
 package com.afsu.mod.transformer;
 
-import com.afsu.mod.AFSUMod;
 import ic2.api.energy.EnergyNet;
 import ic2.api.energy.tile.IEnergyAcceptor;
 import ic2.api.energy.tile.IEnergyEmitter;
 import ic2.api.energy.tile.IEnergySink;
-import ic2.api.energy.tile.IEnergyTile;
 import ic2.api.energy.tile.IMultiEnergySource;
 import ic2.api.network.buffer.NetworkInfo;
 import ic2.api.network.tile.INetworkClientEventListener;
 import ic2.api.tiles.readers.IEUStorage;
+import ic2.core.block.base.features.ITickListener;
+import ic2.core.block.base.features.IWrenchableTile;
 import ic2.core.block.base.tiles.BaseTileEntity;
 import ic2.core.inventory.base.ITileGui;
 import ic2.core.inventory.container.IC2Container;
@@ -26,16 +26,18 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 import com.afsu.mod.tools.IDebuggableMachine;
 
-public class PlasmaTransformerTileEntity extends BaseTileEntity implements IMultiEnergySource, IEnergySink, IEUStorage, ITileGui, INetworkClientEventListener, IDebuggableMachine {
+public class PlasmaTransformerTileEntity extends BaseTileEntity implements IMultiEnergySource, IEnergySink, IEUStorage, ITileGui, INetworkClientEventListener, IWrenchableTile, ITickListener, IDebuggableMachine {
+
+    public final int highOutput = 65536;
 
     @NetworkInfo
     public int energy;
     @NetworkInfo(value = NetworkInfo.BitLevel.BIT_8)
-    public int packetCount = 1;
+    public int packetCount = 32;
     @NetworkInfo
-    public int energyPacket = 32768; // Start at 32k
+    public int energyPacket = 2048; // Default 2048 EU (EV), safe for standard EV machinery!
     @NetworkInfo
-    public int maxEnergy = 32768 * 32;
+    public int maxEnergy = 65536 * 4; // 262,144 EU capacity
     public boolean addedToEnergyNet = false;
 
     public PlasmaTransformerTileEntity(BlockPos pos, BlockState state) {
@@ -62,18 +64,18 @@ public class PlasmaTransformerTileEntity extends BaseTileEntity implements IMult
     public void saveAdditional(CompoundTag compound) {
         super.saveAdditional(compound);
         NBTUtils.putInt(compound, "energy", this.energy, 0);
-        NBTUtils.putInt(compound, "max_energy", this.maxEnergy, 256);
-        NBTUtils.putInt(compound, "packets", this.packetCount, 1);
-        NBTUtils.putInt(compound, "packet_energy", this.energyPacket, 32768);
+        NBTUtils.putInt(compound, "max_energy", this.maxEnergy, 65536 * 4);
+        NBTUtils.putInt(compound, "packets", this.packetCount, 32);
+        NBTUtils.putInt(compound, "packet_energy", this.energyPacket, 2048);
     }
 
     @Override
     public void load(CompoundTag compound) {
         super.load(compound);
         this.energy = NBTUtils.getInt(compound, "energy", 0);
-        this.maxEnergy = NBTUtils.getInt(compound, "max_energy", 256);
-        this.packetCount = NBTUtils.getInt(compound, "packets", 1);
-        this.energyPacket = NBTUtils.getInt(compound, "packet_energy", 32768);
+        this.maxEnergy = NBTUtils.getInt(compound, "max_energy", 65536 * 4);
+        this.packetCount = NBTUtils.getInt(compound, "packets", 32);
+        this.energyPacket = NBTUtils.getInt(compound, "packet_energy", 2048);
     }
 
     @Override
@@ -83,18 +85,28 @@ public class PlasmaTransformerTileEntity extends BaseTileEntity implements IMult
             this.updateGuiField("packetCount");
         }
         if (key == 1) {
-            this.energyPacket = Mth.clamp(value, 32768, 2097152); // clamped from 32k to 2M
-            this.maxEnergy = this.energyPacket * 32;
+            this.energyPacket = Mth.clamp(value, 128, 65536);
+            this.maxEnergy = Math.max(this.highOutput * 4, this.energyPacket * 32);
             this.updateGuiFields(new String[]{"energyPacket", "maxEnergy"});
+            if (this.addedToEnergyNet) {
+                EnergyNet.INSTANCE.updateTile(this);
+            }
         }
     }
 
+    @Override
     public Direction getFacing() {
-        return this.getBlockState().getValue(BlockStateProperties.FACING);
+        if (this.hasLevel() && this.getBlockState().hasProperty(BlockStateProperties.FACING)) {
+            return this.getBlockState().getValue(BlockStateProperties.FACING);
+        }
+        return super.getFacing();
     }
 
     @Override
     public void onLoaded() {
+        if (this.hasLevel() && this.getBlockState().hasProperty(BlockStateProperties.FACING)) {
+            this.setFacingSilent(this.getBlockState().getValue(BlockStateProperties.FACING));
+        }
         super.onLoaded();
         if (this.isSimulating() && !this.addedToEnergyNet) {
             this.addedToEnergyNet = true;
@@ -112,39 +124,94 @@ public class PlasmaTransformerTileEntity extends BaseTileEntity implements IMult
     }
 
     @Override
-    public int getSourceTier() {
-        return 10; // Extreme output tier
+    public void onTick() {
+        this.handleRedstone();
+        this.setActive(this.isRedstonePowered());
     }
 
     @Override
-    public int getSinkTier() {
-        return 10; // Accept anything
+    public boolean setActive(boolean active) {
+        if (super.setActive(active)) {
+            if (this.addedToEnergyNet) {
+                EnergyNet.INSTANCE.updateTile(this);
+            }
+            if (this.level != null && !this.level.isClientSide) {
+                this.level.setBlockAndUpdate(this.worldPosition, this.getBlockState().setValue(PlasmaTransformerBlock.ACTIVE, active));
+            }
+            return true;
+        }
+        return false;
+    }
+
+    // --- IWrenchableTile implementation ---
+
+    @Override
+    public boolean canSetFacing(Direction dir) {
+        return dir != this.getFacing();
     }
 
     @Override
-    public int getMaxEnergyOutput() {
-        return Integer.MAX_VALUE;
+    public void setFacing(Direction facing) {
+        super.setFacing(facing);
+        if (this.level != null && !this.level.isClientSide) {
+            this.level.setBlockAndUpdate(this.worldPosition, this.getBlockState().setValue(BlockStateProperties.FACING, facing));
+        }
+        if (this.addedToEnergyNet) {
+            EnergyNet.INSTANCE.updateTile(this);
+        }
     }
 
     @Override
-    public int getProvidedEnergy() {
-        return this.energy < this.energyPacket ? 0 : this.energyPacket;
+    public boolean canRemoveBlock(Player player) {
+        return true;
     }
 
     @Override
-    public void consumeEnergy(int consumed) {
-        this.energy -= consumed;
-        syncAndSaveIfNeeded();
+    public double getDropRate(Player player) {
+        return 1.0D;
+    }
+
+    // --- EnergyNet methods ---
+
+    @Override
+    public boolean canAcceptEnergy(IEnergyEmitter emitter, Direction side) {
+        // Step-down (inactive): High voltage in on facing (5-dot face)
+        // Step-up (active): Low voltage in on other 5 faces
+        return this.isActive() ? (this.getFacing() != side) : (this.getFacing() == side);
     }
 
     @Override
     public boolean canEmitEnergy(IEnergyAcceptor acceptor, Direction side) {
-        return this.getFacing() != side; // Emit to all sides except input
+        // Step-down (inactive): Low voltage out on other 5 faces
+        // Step-up (active): High voltage out on facing (5-dot face)
+        return this.isActive() ? (this.getFacing() == side) : (this.getFacing() != side);
     }
 
     @Override
-    public boolean canAcceptEnergy(IEnergyEmitter emitter, Direction side) {
-        return this.getFacing() == side; // Accept only from facing
+    public int getSinkTier() {
+        return this.isActive() ? EnergyNet.INSTANCE.getTierFromPower(this.energyPacket) : EnergyNet.INSTANCE.getTierFromPower(this.highOutput);
+    }
+
+    @Override
+    public int getSourceTier() {
+        return this.isActive() ? EnergyNet.INSTANCE.getTierFromPower(this.highOutput) : EnergyNet.INSTANCE.getTierFromPower(this.energyPacket);
+    }
+
+    @Override
+    public int getMaxEnergyOutput() {
+        return this.isActive() ? this.highOutput : this.energyPacket;
+    }
+
+    @Override
+    public int getProvidedEnergy() {
+        int provided = this.isActive() ? this.highOutput : this.energyPacket;
+        return this.energy < provided ? 0 : provided;
+    }
+
+    @Override
+    public void consumeEnergy(int consumed) {
+        this.energy = Math.max(0, this.energy - consumed);
+        syncAndSaveIfNeeded();
     }
 
     @Override
@@ -159,7 +226,7 @@ public class PlasmaTransformerTileEntity extends BaseTileEntity implements IMult
 
     @Override
     public int getTier() {
-        return 10;
+        return this.getSinkTier();
     }
 
     @Override
@@ -170,6 +237,10 @@ public class PlasmaTransformerTileEntity extends BaseTileEntity implements IMult
     @Override
     public int acceptEnergy(Direction side, int amount, int voltage) {
         if (amount <= 0) return 0;
+        int maxAllowed = this.isActive() ? this.energyPacket : this.highOutput;
+        if (amount > maxAllowed) {
+            return amount;
+        }
         int capacity = Math.max(0, this.maxEnergy - this.energy);
         int added = Math.min(amount, capacity);
         if (added > 0) {
@@ -205,19 +276,22 @@ public class PlasmaTransformerTileEntity extends BaseTileEntity implements IMult
 
     @Override
     public boolean hasMultiplePackets() {
-        return this.packetCount > 1;
+        return !this.isActive() && this.packetCount > 1;
     }
 
     @Override
     public int getPacketCount() {
-        return this.packetCount;
+        return !this.isActive() ? this.packetCount : 1;
     }
 
     @Override
     public java.util.List<net.minecraft.network.chat.Component> getDiagnostics() {
         java.util.List<net.minecraft.network.chat.Component> diag = new java.util.ArrayList<>();
+        diag.add(net.minecraft.network.chat.Component.literal("[Mode]: " + (this.isActive() ? "Step-Up" : "Step-Down")).withStyle(net.minecraft.ChatFormatting.GOLD));
         diag.add(net.minecraft.network.chat.Component.literal("[Energy]: " + this.energy + " / " + this.maxEnergy + " EU").withStyle(net.minecraft.ChatFormatting.GREEN));
-        diag.add(net.minecraft.network.chat.Component.literal("[Tier]: " + this.getTier()).withStyle(net.minecraft.ChatFormatting.GREEN));
+        diag.add(net.minecraft.network.chat.Component.literal("[Source Tier]: " + this.getSourceTier() + " (" + this.getMaxEnergyOutput() + " EU/p)").withStyle(net.minecraft.ChatFormatting.GREEN));
+        diag.add(net.minecraft.network.chat.Component.literal("[Sink Tier]: " + this.getSinkTier()).withStyle(net.minecraft.ChatFormatting.GREEN));
+        diag.add(net.minecraft.network.chat.Component.literal("[Packets]: " + this.getPacketCount()).withStyle(net.minecraft.ChatFormatting.GREEN));
         return diag;
     }
 }

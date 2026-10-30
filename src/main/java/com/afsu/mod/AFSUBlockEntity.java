@@ -33,7 +33,7 @@ public class AFSUBlockEntity extends DirectionalEnergyStorageTileEntity implemen
 
     @Override
     public double getDropRate(Player player) {
-        return 0.7d;
+        return 0.7D;
     }
 
     @Override

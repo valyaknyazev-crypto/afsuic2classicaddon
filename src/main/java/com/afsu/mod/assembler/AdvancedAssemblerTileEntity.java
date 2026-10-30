@@ -37,13 +37,15 @@ import com.afsu.mod.tools.IDebuggableMachine;
 import java.util.List;
 import java.util.ArrayList;
 
-public class AdvancedAssemblerTileEntity extends BaseInventoryTileEntity implements ITileGui, IEnergySink, net.minecraft.world.MenuProvider, IProgressMachine, IEUStorage, IDebuggableMachine, ITickListener {
+public class AdvancedAssemblerTileEntity extends BaseInventoryTileEntity implements ITileGui, IEnergySink, net.minecraft.world.MenuProvider, IProgressMachine, IEUStorage, IDebuggableMachine, ITickListener, ic2.core.block.base.features.IWrenchableTile {
 
     public static final int[] INPUT_SLOTS = {0, 1, 2, 3, 4, 5};
-    public static final int[] OUTPUT_SLOTS = {6, 7, 8, 9};
+    public static final int[] OUTPUT_SLOTS = {6, 7};
     public static final int[] UPGRADE_SLOTS = {10, 11, 12, 13};
     public static final int SLOT_FLUID_IN = 14;
     public static final int SLOT_FLUID_OUT = 15;
+    public static final int SLOT_WASTE_IN = 16;
+    public static final int SLOT_WASTE_OUT = 17;
 
     @NetworkInfo
     private int progress = 0;
@@ -87,13 +89,37 @@ public class AdvancedAssemblerTileEntity extends BaseInventoryTileEntity impleme
 
     @NetworkInfo
     public final IC2Tank fluidTank = new IC2Tank(16000);
-    private final LazyOptional<IFluidHandler> fluidHandler = LazyOptional.of(() -> fluidTank);
+    
+    private final LazyOptional<IFluidHandler> fluidHandler = LazyOptional.of(() -> new IFluidHandler() {
+        @Override public int getTanks() { return 2; }
+        @Override public net.minecraftforge.fluids.FluidStack getFluidInTank(int tank) { return tank == 0 ? fluidTank.getFluid() : wasteTank.getFluid(); }
+        @Override public int getTankCapacity(int tank) { return tank == 0 ? fluidTank.getCapacity() : wasteTank.getCapacity(); }
+        @Override public boolean isFluidValid(int tank, net.minecraftforge.fluids.FluidStack stack) { return tank == 0 && fluidTank.isFluidValid(stack); }
+        @Override public int fill(net.minecraftforge.fluids.FluidStack resource, FluidAction action) { return fluidTank.fill(resource, action); }
+        @Override public net.minecraftforge.fluids.FluidStack drain(net.minecraftforge.fluids.FluidStack resource, FluidAction action) { 
+            net.minecraftforge.fluids.FluidStack w = wasteTank.drain(resource, FluidAction.SIMULATE);
+            if (!w.isEmpty()) return wasteTank.drain(resource, action);
+            return fluidTank.drain(resource, action);
+        }
+        @Override public net.minecraftforge.fluids.FluidStack drain(int maxDrain, FluidAction action) {
+            net.minecraftforge.fluids.FluidStack w = wasteTank.drain(maxDrain, FluidAction.SIMULATE);
+            if (!w.isEmpty()) return wasteTank.drain(maxDrain, action);
+            return fluidTank.drain(maxDrain, action);
+        }
+    });
+
     private final BucketFiller bucketFiller = new BucketFiller(this, fluidTank, SLOT_FLUID_IN, SLOT_FLUID_OUT);
 
+    @NetworkInfo
+    public final IC2Tank wasteTank = new IC2Tank(16000);
+    private final BucketFiller wasteBucketFiller = new BucketFiller(this, wasteTank, SLOT_WASTE_IN, SLOT_WASTE_OUT);
+
+
     public AdvancedAssemblerTileEntity(BlockPos pos, BlockState state) {
-        super(pos, state, 16);
-        this.addGuiFields("fluidTank", "energy", "progress", "maxProgress", "tier", "maxEnergy");
+        super(pos, state, 18);
+        this.addGuiFields("fluidTank", "wasteTank", "energy", "progress", "maxProgress", "tier", "maxEnergy");
         this.fluidTank.addListener(tank -> this.updateGuiField("fluidTank"));
+        this.wasteTank.addListener(tank -> this.updateGuiField("wasteTank"));
     }
     
     @Override
@@ -118,9 +144,17 @@ public class AdvancedAssemblerTileEntity extends BaseInventoryTileEntity impleme
         handler.registerSlotAccess(AccessRule.IMPORT, SLOT_FLUID_IN);
         handler.registerNamedSlot(SlotType.INPUT, SLOT_FLUID_IN);
         
+        
         handler.registerSlotAccess(AccessRule.EXPORT, SLOT_FLUID_OUT);
         handler.registerNamedSlot(SlotType.OUTPUT, SLOT_FLUID_OUT);
         handler.registerInputFilter(SpecialFilters.ALWAYS_FALSE, SLOT_FLUID_OUT);
+
+        handler.registerSlotAccess(AccessRule.IMPORT, SLOT_WASTE_IN);
+        handler.registerNamedSlot(SlotType.INPUT, SLOT_WASTE_IN);
+        handler.registerSlotAccess(AccessRule.EXPORT, SLOT_WASTE_OUT);
+        handler.registerNamedSlot(SlotType.OUTPUT, SLOT_WASTE_OUT);
+        handler.registerInputFilter(SpecialFilters.ALWAYS_FALSE, SLOT_WASTE_OUT);
+
     }
     
     public net.minecraftforge.fluids.capability.templates.FluidTank getFluidTank() {
@@ -134,6 +168,7 @@ public class AdvancedAssemblerTileEntity extends BaseInventoryTileEntity impleme
         NBTUtils.putInt(compound, "progress", this.progress, 0);
         NBTUtils.putInt(compound, "maxProgress", this.maxProgress, 0);
         compound.put("Fluid", fluidTank.writeToNBT(new CompoundTag()));
+        compound.put("WasteFluid", wasteTank.writeToNBT(new CompoundTag()));
     }
 
     @Override
@@ -145,17 +180,23 @@ public class AdvancedAssemblerTileEntity extends BaseInventoryTileEntity impleme
         if (compound.contains("Fluid")) {
             fluidTank.readFromNBT(compound.getCompound("Fluid"));
         }
+        if (compound.contains("WasteFluid")) {
+            wasteTank.readFromNBT(compound.getCompound("WasteFluid"));
+        }
         applyUpgrades();
         this.energy = Math.min(this.energy, this.maxEnergy);
     }
 
     @Override
     public void onLoaded() {
+        if (this.hasLevel() && this.getBlockState().hasProperty(net.minecraft.world.level.block.state.properties.BlockStateProperties.FACING)) {
+            this.setFacingSilent(this.getBlockState().getValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.FACING));
+        }
         super.onLoaded();
         if (this.isSimulating() && !this.addedToEnergyNet) {
             this.addedToEnergyNet = true;
             EnergyNet.INSTANCE.addTile(this);
-            trace("СЂСџвЂќРЉ ON_LOADED: Added to EnergyNet");
+            trace("РЎР‚РЎСџРІР‚СњР Р‰ ON_LOADED: Added to EnergyNet");
         }
     }
 
@@ -164,7 +205,7 @@ public class AdvancedAssemblerTileEntity extends BaseInventoryTileEntity impleme
         if (this.isSimulating() && this.addedToEnergyNet) {
             this.addedToEnergyNet = false;
             EnergyNet.INSTANCE.removeTile(this);
-            trace("СЂСџвЂќРЉ ON_UNLOADED: Removed from EnergyNet");
+            trace("РЎР‚РЎСџРІР‚СњР Р‰ ON_UNLOADED: Removed from EnergyNet");
         }
         super.onUnloaded(chunk);
     }
@@ -265,6 +306,7 @@ public class AdvancedAssemblerTileEntity extends BaseInventoryTileEntity impleme
 
     private void processRecipes() {
         bucketFiller.fillTank();
+        wasteBucketFiller.fillItem();
         
         boolean inputsChanged = false;
         for (int i = 0; i < INPUT_SLOTS.length; i++) {
@@ -309,52 +351,78 @@ public class AdvancedAssemblerTileEntity extends BaseInventoryTileEntity impleme
             this.maxProgress = (int) Math.max(1, Math.round(baseDuration / speedMultiplier));
             this.updateGuiField("maxProgress");
             
-            if (this.energy >= actualEuPerTick) {
+                        if (this.energy >= actualEuPerTick) {
                 net.minecraft.world.item.ItemStack resultPreview = rec.getResultItem();
-                if (canInsert(resultPreview)) {
+                net.minecraft.world.item.ItemStack secResultPreview = rec.getSecondaryResult() != null ? rec.getSecondaryResult() : net.minecraft.world.item.ItemStack.EMPTY;
+                
+                boolean canInsertPrimary = canInsert(resultPreview);
+                boolean canInsertSecondary = secResultPreview.isEmpty() || canInsert(secResultPreview);
+                
+                boolean canInsertBoth = false;
+                if (canInsertPrimary && canInsertSecondary) {
+                    if (!secResultPreview.isEmpty()) {
+                        canInsertBoth = canInsertMulti(resultPreview, secResultPreview);
+                    } else {
+                        canInsertBoth = true;
+                    }
+                }
+
+                if (canInsertBoth) {
                     boolean hasFluid = true;
                     if (rec.getFluidRequirement() != null && !rec.getFluidRequirement().isEmpty()) {
                         net.minecraftforge.fluids.FluidStack drained = fluidTank.drain(rec.getFluidRequirement(), net.minecraftforge.fluids.capability.IFluidHandler.FluidAction.SIMULATE);
                         if (drained.isEmpty() || drained.getAmount() < rec.getFluidRequirement().getAmount()) {
                             hasFluid = false;
+                        } else {
+                            String inFluid = net.minecraftforge.registries.ForgeRegistries.FLUIDS.getKey(rec.getFluidRequirement().getFluid()).getPath();
+                            net.minecraft.world.level.material.Fluid outFluid = null;
+                            if (inFluid.equals("sulfuric_acid")) {
+                                outFluid = com.afsu.mod.registry.AFSUFluids.WASTE_ACID.get();
+                            } else if (inFluid.equals("hydrogen_peroxide")) {
+                                outFluid = com.afsu.mod.registry.AFSUFluids.TOXIC_SLUDGE.get();
+                            }
+                            if (outFluid != null) {
+                                int fillable = wasteTank.fill(new net.minecraftforge.fluids.FluidStack(outFluid, rec.getFluidRequirement().getAmount()), net.minecraftforge.fluids.capability.IFluidHandler.FluidAction.SIMULATE);
+                                if (fillable < rec.getFluidRequirement().getAmount()) {
+                                    hasFluid = false;
+                                }
+                            }
                         }
                     }
                     
                     if (hasFluid) {
                         this.energy -= actualEuPerTick;
-
-                        
-                        if (this.energy < 0) {
-                            trace("СЂСџС™РЃ ANOMALY! Energy became negative after crafting: " + this.energy);
-                        }
-                        
                         progress++;
 
                         if (progress >= maxProgress) {
                             net.minecraft.world.item.ItemStack result = rec.assemble(recipeContainer);
+                            net.minecraft.world.item.ItemStack secResult = rec.getSecondaryResult() != null ? rec.getSecondaryResult().copy() : net.minecraft.world.item.ItemStack.EMPTY;
                             if (rec.getFluidRequirement() != null && !rec.getFluidRequirement().isEmpty()) {
                                 fluidTank.drain(rec.getFluidRequirement(), net.minecraftforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
+                                
+                                String inFluid = net.minecraftforge.registries.ForgeRegistries.FLUIDS.getKey(rec.getFluidRequirement().getFluid()).getPath();
+                                net.minecraft.world.level.material.Fluid outFluid = null;
+                                if (inFluid.equals("sulfuric_acid")) {
+                                    outFluid = com.afsu.mod.registry.AFSUFluids.WASTE_ACID.get();
+                                } else if (inFluid.equals("hydrogen_peroxide")) {
+                                    outFluid = com.afsu.mod.registry.AFSUFluids.TOXIC_SLUDGE.get();
+                                }
+                                if (outFluid != null) {
+                                    wasteTank.fill(new net.minecraftforge.fluids.FluidStack(outFluid, rec.getFluidRequirement().getAmount()), net.minecraftforge.fluids.capability.IFluidHandler.FluidAction.EXECUTE);
+                                }
                             }
-                            insertResult(result);
                             
+                            insertResult(result);
+                            if (!secResult.isEmpty()) {
+                                insertResult(secResult);
+                            }
                             consumeIngredients(rec);
-                            trace("РІСљвЂ¦ CRAFTING FINISHED: " + rec.getResultItem().getHoverName().getString());
                             
                             progress = 0;
-
                             this.setChanged();
-                        } else if (progress == 1) {
-                            trace("РІС™в„ўРїС‘РЏ CRAFTING STARTED: " + rec.getResultItem().getHoverName().getString() + " (Cost: " + actualEuPerTick + " EU/t)");
                         }
                     }
-                }
-            }
-        } else {
-            if (progress > 0) {
-                progress = 0;
-
-                this.setChanged();
-            }
+                }            }
         }
     }
     
@@ -420,15 +488,34 @@ public class AdvancedAssemblerTileEntity extends BaseInventoryTileEntity impleme
         }
         
         if (this.maxEnergy != lastTraceMaxEnergy || this.speedMultiplier != lastTraceSpeed || this.energyDemandMultiplier != lastTraceEnergyMult) {
-            trace("СЂСџвЂєВ РїС‘РЏ UPGRADES CHANGED! Recalculated: maxEnergy=" + this.maxEnergy + ", speedMult=" + String.format("%.2f", this.speedMultiplier) + ", energyMult=" + String.format("%.2f", this.energyDemandMultiplier));
+            trace("РЎР‚РЎСџРІР‚С”Р’В Р С—РЎвЂР РЏ UPGRADES CHANGED! Recalculated: maxEnergy=" + this.maxEnergy + ", speedMult=" + String.format("%.2f", this.speedMultiplier) + ", energyMult=" + String.format("%.2f", this.energyDemandMultiplier));
             lastTraceMaxEnergy = this.maxEnergy;
             lastTraceSpeed = this.speedMultiplier;
             lastTraceEnergyMult = this.energyDemandMultiplier;
         }
     }
-    
-
-    
+    private boolean canInsertMulti(net.minecraft.world.item.ItemStack stack1, net.minecraft.world.item.ItemStack stack2) {
+        int emptySlots = 0;
+        boolean fit1 = false;
+        boolean fit2 = false;
+        for (int i : OUTPUT_SLOTS) {
+            net.minecraft.world.item.ItemStack slot = this.inventory.get(i);
+            if (slot.isEmpty()) {
+                emptySlots++;
+            } else {
+                if (!fit1 && net.minecraft.world.item.ItemStack.isSameItemSameTags(slot, stack1) && slot.getCount() + stack1.getCount() <= slot.getMaxStackSize()) {
+                    fit1 = true;
+                } else if (!fit2 && net.minecraft.world.item.ItemStack.isSameItemSameTags(slot, stack2) && slot.getCount() + stack2.getCount() <= slot.getMaxStackSize()) {
+                    fit2 = true;
+                }
+            }
+        }
+        if (fit1 && fit2) return true;
+        if (fit1 && emptySlots >= 1) return true;
+        if (fit2 && emptySlots >= 1) return true;
+        if (emptySlots >= 2) return true;
+        return false;
+    }
     private boolean canInsert(net.minecraft.world.item.ItemStack stack) {
         for (int i : OUTPUT_SLOTS) {
             net.minecraft.world.item.ItemStack slot = this.inventory.get(i);
@@ -515,5 +602,30 @@ public class AdvancedAssemblerTileEntity extends BaseInventoryTileEntity impleme
         }
         return diag;
     }
+
+    // --- IWrenchableTile implementation ---
+    @Override
+    public boolean canSetFacing(Direction dir) {
+        return dir.getAxis().isHorizontal() && dir != this.getFacing();
+    }
+
+    @Override
+    public void setFacing(Direction dir) {
+        super.setFacing(dir);
+        if (this.level != null && !this.level.isClientSide) {
+            this.level.setBlockAndUpdate(this.worldPosition, this.getBlockState().setValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.FACING, dir));
+        }
+    }
+
+    @Override
+    public boolean canRemoveBlock(Player player) {
+        return true;
+    }
+
+    @Override
+    public double getDropRate(Player player) {
+        return 0.8D;
+    }
 }
+
 

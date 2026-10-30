@@ -13,11 +13,14 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 import ic2.core.block.base.IC2ContainerBlock;
+import ic2.core.block.base.tiles.BaseTileEntity;
+import ic2.core.utils.helpers.Tool;
 
 public abstract class DirectionalEnergyStorageBlock extends IC2ContainerBlock {
 
     public DirectionalEnergyStorageBlock(String name, Properties properties) {
         super(name, properties);
+        this.setHarvestTool(Tool.PICKAXE.withLevel(1));
         this.registerDefaultState(this.stateDefinition.any().setValue(BlockStateProperties.FACING, Direction.NORTH));
     }
 
@@ -37,8 +40,16 @@ public abstract class DirectionalEnergyStorageBlock extends IC2ContainerBlock {
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
         super.setPlacedBy(level, pos, state, placer, stack);
         BlockEntity tile = level.getBlockEntity(pos);
-        if (tile instanceof DirectionalEnergyStorageTileEntity) {
-            ((DirectionalEnergyStorageTileEntity) tile).setFacingSilent(state.getValue(BlockStateProperties.FACING));
+        if (tile instanceof BaseTileEntity base) {
+            base.setFacingSilent(state.getValue(BlockStateProperties.FACING));
         }
+    }
+
+    @Override
+    public Direction getFacing(BlockState state, Level world, BlockPos pos) {
+        if (state.hasProperty(BlockStateProperties.FACING)) {
+            return state.getValue(BlockStateProperties.FACING);
+        }
+        return super.getFacing(state, world, pos);
     }
 }

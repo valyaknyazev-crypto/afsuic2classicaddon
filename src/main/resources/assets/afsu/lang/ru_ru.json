@@ -60,5 +60,11 @@
   "gui.afsu.jade.energy_demand": "Потребление энергии: %sx",
   "gui.afsu.jade.progress": "Прогресс: %s / %st",
   "gui.afsu.jade.cable.conductor": "Предел проводника: %s EU/t",
-  "gui.afsu.jade.cable.insulation": "Предел изоляции: %s EU/t"
+  "gui.afsu.jade.cable.insulation": "Предел изоляции: %s EU/t",
+  "fluid.afsu.waste_acid": "Отработанная кислота",
+  "block.afsu.waste_acid": "Отработанная кислота",
+  "item.afsu.waste_acid_cell": "Капсула с отработанной кислотой",
+  "fluid.afsu.toxic_sludge": "Токсичный осадок",
+  "block.afsu.toxic_sludge": "Токсичный осадок",
+  "item.afsu.toxic_sludge_cell": "Капсула с токсичным осадком"
 }

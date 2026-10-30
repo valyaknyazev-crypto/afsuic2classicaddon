@@ -14,15 +14,17 @@ public class AdvancedAssemblerRecipe implements Recipe<Container> {
     private final ResourceLocation id;
     private final List<IInput> inputs;
     private final ItemStack result;
+    private final ItemStack secondaryResult;
     private final net.minecraftforge.fluids.FluidStack fluidRequirement;
     private final int euCost;
     private final int duration;
     private final net.minecraft.core.NonNullList<net.minecraft.world.item.crafting.Ingredient> ingredients;
     
-    public AdvancedAssemblerRecipe(ResourceLocation id, List<IInput> inputs, ItemStack result, net.minecraftforge.fluids.FluidStack fluidRequirement, int euCost, int duration) {
+    public AdvancedAssemblerRecipe(ResourceLocation id, List<IInput> inputs, ItemStack result, ItemStack secondaryResult, net.minecraftforge.fluids.FluidStack fluidRequirement, int euCost, int duration) {
         this.id = id;
         this.inputs = inputs;
         this.result = result;
+        this.secondaryResult = secondaryResult;
         this.fluidRequirement = fluidRequirement;
         this.euCost = euCost;
         this.duration = duration;
@@ -96,6 +98,10 @@ public class AdvancedAssemblerRecipe implements Recipe<Container> {
     @Override
     public ItemStack getResultItem() {
         return result;
+    }
+    
+    public ItemStack getSecondaryResult() {
+        return secondaryResult;
     }
     
     @Override

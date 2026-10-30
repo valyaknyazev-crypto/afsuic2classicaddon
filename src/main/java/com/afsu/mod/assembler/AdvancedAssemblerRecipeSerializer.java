@@ -27,6 +27,10 @@ public class AdvancedAssemblerRecipeSerializer implements RecipeSerializer<Advan
         }
 
         ItemStack output = ShapedRecipe.itemStackFromJson(pSerializedRecipe.getAsJsonObject("result"));
+        ItemStack secondaryOutput = ItemStack.EMPTY;
+        if (pSerializedRecipe.has("secondary_result")) {
+            secondaryOutput = ShapedRecipe.itemStackFromJson(pSerializedRecipe.getAsJsonObject("secondary_result"));
+        }
 
         net.minecraftforge.fluids.FluidStack fluid = net.minecraftforge.fluids.FluidStack.EMPTY;
         if (pSerializedRecipe.has("fluid")) {
@@ -42,7 +46,7 @@ public class AdvancedAssemblerRecipeSerializer implements RecipeSerializer<Advan
         int euCost = pSerializedRecipe.has("eu_cost") ? pSerializedRecipe.get("eu_cost").getAsInt() : 20;
         int duration = pSerializedRecipe.has("duration") ? pSerializedRecipe.get("duration").getAsInt() : 100;
 
-        return new AdvancedAssemblerRecipe(pRecipeId, inputs, output, fluid, euCost, duration);
+        return new AdvancedAssemblerRecipe(pRecipeId, inputs, output, secondaryOutput, fluid, euCost, duration);
     }
 
     @Override
@@ -55,10 +59,11 @@ public class AdvancedAssemblerRecipeSerializer implements RecipeSerializer<Advan
         }
 
         ItemStack output = pBuffer.readItem();
+        ItemStack secondaryOutput = pBuffer.readItem();
         net.minecraftforge.fluids.FluidStack fluid = net.minecraftforge.fluids.FluidStack.readFromPacket(pBuffer);
         int euCost = pBuffer.readVarInt();
         int duration = pBuffer.readVarInt();
-        return new AdvancedAssemblerRecipe(pRecipeId, inputs, output, fluid, euCost, duration);
+        return new AdvancedAssemblerRecipe(pRecipeId, inputs, output, secondaryOutput, fluid, euCost, duration);
     }
 
     @Override
@@ -68,6 +73,7 @@ public class AdvancedAssemblerRecipeSerializer implements RecipeSerializer<Advan
             ing.serialize(pBuffer);
         }
         pBuffer.writeItem(pRecipe.getResultItem());
+        pBuffer.writeItem(pRecipe.getSecondaryResult());
         pRecipe.getFluidRequirement().writeToPacket(pBuffer);
         pBuffer.writeVarInt(pRecipe.getEuCost());
         pBuffer.writeVarInt(pRecipe.getDuration());

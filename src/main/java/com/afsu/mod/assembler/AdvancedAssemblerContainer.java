@@ -20,26 +20,27 @@ public class AdvancedAssemblerContainer extends ContainerComponent<AdvancedAssem
         
         // Fluid Slots
         this.addSlot(new ic2.core.inventory.slot.FilterSlot(tile, AdvancedAssemblerTileEntity.SLOT_FLUID_IN, 7, 15, T -> net.minecraftforge.fluids.FluidUtil.getFluidHandler(T).isPresent()));
-        this.addSlot(new ic2.core.inventory.slot.FilterSlot(tile, AdvancedAssemblerTileEntity.SLOT_FLUID_OUT, 7, 57, T -> false));
-
+        this.addSlot(new ic2.core.inventory.slot.FilterSlot(tile, AdvancedAssemblerTileEntity.SLOT_FLUID_OUT, 7, 56, T -> false));
+        this.addSlot(new ic2.core.inventory.slot.FilterSlot(tile, AdvancedAssemblerTileEntity.SLOT_WASTE_IN, 48, 15, T -> net.minecraftforge.fluids.FluidUtil.getFluidHandler(T).isPresent()));
+        this.addSlot(new ic2.core.inventory.slot.FilterSlot(tile, AdvancedAssemblerTileEntity.SLOT_WASTE_OUT, 48, 56, T -> false));
         // Machine Slots
-        for (int i = 0; i < 6; i++) {
-            this.addSlot(new ic2.core.inventory.slot.FilterSlot(tile, AdvancedAssemblerTileEntity.INPUT_SLOTS[i], 49 + (i % 2) * 20, 15 + (i / 2) * 20, T -> true));
+        for (int i = 0; i < AdvancedAssemblerTileEntity.INPUT_SLOTS.length; i++) {
+            this.addSlot(new ic2.core.inventory.slot.FilterSlot(tile, AdvancedAssemblerTileEntity.INPUT_SLOTS[i], 69 + (i % 2) * 20, 15 + (i / 2) * 20, T -> true));
         }
-        for (int i = 0; i < 4; i++) {
-            this.addSlot(new ic2.core.inventory.slot.FilterSlot(tile, AdvancedAssemblerTileEntity.OUTPUT_SLOTS[i], 113 + (i % 2) * 20, 26 + (i / 2) * 20, T -> false));
+        for (int i = 0; i < AdvancedAssemblerTileEntity.OUTPUT_SLOTS.length; i++) {
+            this.addSlot(new ic2.core.inventory.slot.FilterSlot(tile, AdvancedAssemblerTileEntity.OUTPUT_SLOTS[i], 133, 26 + i * 20, T -> false));
         }
         
         // Upgrades
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < AdvancedAssemblerTileEntity.UPGRADE_SLOTS.length; i++) {
             this.addSlot(new ic2.core.inventory.slot.FilterSlot(tile, AdvancedAssemblerTileEntity.UPGRADE_SLOTS[i], 154, 8 + i * 18, T -> T.getItem() instanceof ic2.api.items.IUpgradeItem));
         }
         
         this.addPlayerInventory(player.getInventory());
 
         this.addComponent(new TankComponent(new Box2i(28, 14, 16, 58), new Vec2i(176, 31), tile.getFluidTank()));
-        this.addComponent(new ProgressComponent(new Box2i(88, 35, 24, 17), tile, new Vec2i(176, 14), false));
-        this.addComponent(new ChargeBarComponent(new Box2i(90, 57, 14, 14), tile, new Vec2i(176, 0), true));
+        this.addComponent(new ProgressComponent(new Box2i(108, 35, 24, 17), tile, new Vec2i(176, 14), false));
+        this.addComponent(new ChargeBarComponent(new Box2i(113, 57, 14, 14), tile, new Vec2i(176, 0), true));
         
     }
 
@@ -49,3 +50,5 @@ public class AdvancedAssemblerContainer extends ContainerComponent<AdvancedAssem
     }
 
 }
+
+

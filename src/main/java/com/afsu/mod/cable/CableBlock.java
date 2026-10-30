@@ -1,7 +1,10 @@
 package com.afsu.mod.cable;
 
+import ic2.api.blocks.IWrenchable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -15,12 +18,19 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+
+import java.util.Collections;
+import java.util.List;
 import java.util.function.BiFunction;
 
-public class CableBlock extends Block implements EntityBlock {
+public class CableBlock extends Block implements EntityBlock, IWrenchable {
 
     public static final BooleanProperty NORTH = BlockStateProperties.NORTH;
     public static final BooleanProperty EAST = BlockStateProperties.EAST;
@@ -128,5 +138,57 @@ public class CableBlock extends Block implements EntityBlock {
             case DOWN: return state.setValue(DOWN, connect);
         }
         return state;
+    }
+
+    @Override
+    public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
+        return Collections.singletonList(new ItemStack(this));
+    }
+
+    @Override
+    public ItemStack getCloneItemStack(BlockState state, HitResult target, BlockGetter level, BlockPos pos, Player player) {
+        return new ItemStack(this);
+    }
+
+    // --- IWrenchable Implementation ---
+
+    @Override
+    public Direction getFacing(BlockState state, Level world, BlockPos pos) {
+        return null; // Cables do not rotate
+    }
+
+    @Override
+    public boolean canSetFacing(BlockState state, Level world, BlockPos pos, Player player, Direction side) {
+        return false;
+    }
+
+    @Override
+    public boolean setFacing(BlockState state, Level world, BlockPos pos, Player player, Direction side) {
+        return false;
+    }
+
+    @Override
+    public boolean doSpecialAction(BlockState state, Level world, BlockPos pos, Direction dir, Player player, Vec3 hit) {
+        return false;
+    }
+
+    @Override
+    public AABB hasSpecialAction(BlockState state, Level world, BlockPos pos, Direction dir, Player player, Vec3 hit) {
+        return null;
+    }
+
+    @Override
+    public boolean canRemoveBlock(BlockState state, Level world, BlockPos pos, Player player) {
+        return true;
+    }
+
+    @Override
+    public double getDropRate(BlockState state, Level world, BlockPos pos, Player player) {
+        return 1.0D;
+    }
+
+    @Override
+    public List<ItemStack> getDrops(BlockState state, Level world, BlockPos pos, Player player) {
+        return Collections.singletonList(new ItemStack(this));
     }
 }

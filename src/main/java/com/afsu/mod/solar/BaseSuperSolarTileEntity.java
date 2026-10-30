@@ -37,7 +37,6 @@ public abstract class BaseSuperSolarTileEntity extends BaseGeneratorTileEntity i
     protected int emittedThisTick = 0;
     private long lastEmitResetTick = -1;
     
-    
     private void resetEmitIfNewTick() {
         if (this.level != null && this.level.getGameTime() != lastEmitResetTick) {
             lastEmitResetTick = this.level.getGameTime();
@@ -124,7 +123,6 @@ public abstract class BaseSuperSolarTileEntity extends BaseGeneratorTileEntity i
         return false;
     }
 
-
     public int getCurrentOutput() {
         if (!isActive()) return 0;
         return (this.day && skyBlockCheck()) ? this.production : this.lowerProduction;
@@ -191,7 +189,6 @@ public abstract class BaseSuperSolarTileEntity extends BaseGeneratorTileEntity i
                     this.updateGuiField("storage");
                 }
             }
-            
         }
     }
     
@@ -216,6 +213,27 @@ public abstract class BaseSuperSolarTileEntity extends BaseGeneratorTileEntity i
         return true; // Emit in all directions, including UP
     }
 
+    // --- IWrenchableTile implementation ---
+    @Override
+    public boolean canSetFacing(Direction dir) {
+        return false;
+    }
+
+    @Override
+    public boolean canRemoveBlock(Player player) {
+        return true;
+    }
+
+    @Override
+    public double getDropRate(Player player) {
+        return 1.0D;
+    }
+
+    @Override
+    public boolean isHarvestWrenchRequired(Player player) {
+        return false;
+    }
+
     @Override
     public java.util.List<net.minecraft.network.chat.Component> getDiagnostics() {
         java.util.List<net.minecraft.network.chat.Component> diag = new java.util.ArrayList<>();
@@ -233,4 +251,3 @@ public abstract class BaseSuperSolarTileEntity extends BaseGeneratorTileEntity i
     public static BlockEntityType<?> getSingularityType() { return com.afsu.mod.registry.AFSUBlockEntities.SINGULARITY_SOLAR_PANEL_ENTITY.get(); }
     public static BlockEntityType<?> getAbsoluteType() { return com.afsu.mod.registry.AFSUBlockEntities.ABSOLUTE_SOLAR_PANEL_ENTITY.get(); }
 }
-

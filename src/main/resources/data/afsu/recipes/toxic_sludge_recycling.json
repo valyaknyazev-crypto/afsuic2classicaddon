@@ -1,0 +1,21 @@
+﻿{
+  "type": "afsu:advanced_assembler",
+  "inputs": [
+    {
+      "ingredient": {
+        "item": "afsu:toxic_sludge_cell"
+      },
+      "size": 1
+    }
+  ],
+  "result": {
+    "item": "ic2:dust_gold",
+    "count": 1
+  },
+  "secondary_result": {
+    "item": "ic2:cell_empty",
+    "count": 1
+  },
+  "eu_cost": 200,
+  "duration": 200
+}

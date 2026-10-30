@@ -34,13 +34,14 @@ public class AdvancedAssemblerRecipeCategory implements IRecipeCategory<Advanced
     private final IDrawableStatic tankOverlay;
 
     public AdvancedAssemblerRecipeCategory(IGuiHelper guiHelper) {
-        ResourceLocation guiTexture = new ResourceLocation(AFSUMod.MODID, "textures/gui/advanced_assembler.png");
+        ResourceLocation guiTexture = new ResourceLocation(AFSUMod.MODID, "textures/gui/advanced_assembler_jeigui.png");
         
-        // Crop the actual machine GUI texture! X: 24->154, Y: 11->76 (Width: 130, Height: 65)
-        this.background = guiHelper.createDrawable(guiTexture, 24, 11, 127, 65);
+        // Crop the JEI GUI texture precisely to avoid showing window borders
+        // Crop: X=22, Y=11, Width=130, Height=65
+        this.background = guiHelper.createDrawable(guiTexture, 22, 11, 130, 65);
         this.icon = guiHelper.createDrawableIngredient(VanillaTypes.ITEM_STACK, new ItemStack(com.afsu.mod.registry.AFSUBlocks.ADVANCED_ASSEMBLER.get()));
         
-        IDrawableStatic arrowStatic = guiHelper.createDrawable(guiTexture, 176, 15, 24, 16);
+        IDrawableStatic arrowStatic = guiHelper.createDrawable(guiTexture, 176, 14, 24, 17);
         this.arrow = guiHelper.createAnimatedDrawable(arrowStatic, 100, IDrawableAnimated.StartDirection.LEFT, false);
         
         // Full charge bar from 176, 0
@@ -73,9 +74,8 @@ public class AdvancedAssemblerRecipeCategory implements IRecipeCategory<Advanced
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, AdvancedAssemblerRecipe recipe, IFocusGroup focuses) {
         // Inputs (6 slots, 2 cols x 3 rows)
-        // In GUI: item starts at 49, 15. Relative to 24, 11 -> 25, 4
         for (int i = 0; i < 6; i++) {
-            var slotBuilder = builder.addSlot(RecipeIngredientRole.INPUT, 25 + (i % 2) * 20, 4 + (i / 2) * 20);
+            var slotBuilder = builder.addSlot(RecipeIngredientRole.INPUT, 27 + (i % 2) * 20, 4 + (i / 2) * 20);
             if (i < recipe.getInputs().size()) {
                 ic2.api.recipes.ingridients.inputs.IInput input = recipe.getInputs().get(i);
                 List<ItemStack> scaled = new ArrayList<>();
@@ -88,52 +88,69 @@ public class AdvancedAssemblerRecipeCategory implements IRecipeCategory<Advanced
             }
         }
         
-        // Fluid
-        // In GUI: item starts at 29, 15. Relative to 24, 11 -> 5, 4
+        // Fluid Input (Left Tank) at relative X: 8, Y: 5
         FluidStack fluid = recipe.getFluidRequirement();
         if (fluid != null && !fluid.isEmpty()) {
-            builder.addSlot(RecipeIngredientRole.INPUT, 5, 4) // +1px border
+            builder.addSlot(RecipeIngredientRole.INPUT, 6, 3)
                    .addIngredients(ForgeTypes.FLUID_STACK, List.of(fluid))
-                   .setFluidRenderer(16000, false, 14, 56)
-                   .setOverlay(tankOverlay, -1, -1);
+                   .setFluidRenderer(16000, false, 16, 58)
+                   .setOverlay(tankOverlay, 0, 0);
+                   
+            // Hardcode fluid byproduct logic for JEI display in the Right Tank (Relative X: 113, Y: 5)
+            net.minecraft.world.level.material.Fluid byproduct = null;
+            if (fluid.getFluid() == com.afsu.mod.registry.AFSUFluids.SULFURIC_ACID.get()) {
+                byproduct = com.afsu.mod.registry.AFSUFluids.WASTE_ACID.get();
+            } else if (fluid.getFluid() == com.afsu.mod.registry.AFSUFluids.HYDROGEN_PEROXIDE.get()) {
+                byproduct = com.afsu.mod.registry.AFSUFluids.TOXIC_SLUDGE.get();
+            }
+            
+            if (byproduct != null) {
+                builder.addSlot(RecipeIngredientRole.OUTPUT, 111, 3)
+                       .addIngredients(ForgeTypes.FLUID_STACK, List.of(new FluidStack(byproduct, fluid.getAmount())))
+                       .setFluidRenderer(16000, false, 16, 58)
+                       .setOverlay(tankOverlay, 0, 0);
+            }
         }
         
-        // Outputs (4 slots, 2 cols x 2 rows)
-        // In GUI: item starts at 113, 26. Relative to 24, 11 -> 89, 15
-        builder.addSlot(RecipeIngredientRole.OUTPUT, 89, 15)
+        // Outputs (2 slots, 1 col x 2 rows)
+        builder.addSlot(RecipeIngredientRole.OUTPUT, 91, 15)
                .addItemStack(recipe.getResultItem());
-        builder.addSlot(RecipeIngredientRole.OUTPUT, 109, 15);
-        builder.addSlot(RecipeIngredientRole.OUTPUT, 89, 35);
-        builder.addSlot(RecipeIngredientRole.OUTPUT, 109, 35);
+               
+        if (recipe.getSecondaryResult() != null && !recipe.getSecondaryResult().isEmpty()) {
+            builder.addSlot(RecipeIngredientRole.OUTPUT, 91, 35)
+                   .addItemStack(recipe.getSecondaryResult());
+        } else {
+            builder.addSlot(RecipeIngredientRole.OUTPUT, 91, 35);
+        }
     }
 
     @Override
     public void draw(AdvancedAssemblerRecipe recipe, IRecipeSlotsView recipeSlotsView, PoseStack stack, double mouseX, double mouseY) {
-        // Tank is at 4, 3
+        // Tank overlays for empty tanks
         FluidStack fluid = recipe.getFluidRequirement();
         if (fluid == null || fluid.isEmpty()) {
-            tankOverlay.draw(stack, 4, 3);
+            tankOverlay.draw(stack, 6, 3);
         }
         
-        // Charge bar is at 66, 46 (90, 57 relative to 24, 11)
-        chargeBar.draw(stack, 66, 46);
+        // Charge bar
+        chargeBar.draw(stack, 68, 46);
         
-        // Arrow is at 64, 24 (88, 35 relative to 24, 11)
-        arrow.draw(stack, 64, 24);
+        // Arrow
+        arrow.draw(stack, 65, 25);
     }
 
     @Override
     public List<Component> getTooltipStrings(AdvancedAssemblerRecipe recipe, IRecipeSlotsView recipeSlotsView, double mouseX, double mouseY) {
         List<Component> tooltips = new ArrayList<>();
         
-        // Charge bar bounds (X=66, Y=46, W=14, H=14)
-        if (mouseX >= 66 && mouseX < 80 && mouseY >= 46 && mouseY < 60) {
+        // Charge bar bounds
+        if (mouseX >= 68 && mouseX < 82 && mouseY >= 46 && mouseY < 60) {
             tooltips.add(Component.translatable("jei.afsu.recipe.cost", recipe.getEuCost()));
         }
         
-        // Tank bounds (X=4, Y=3, W=16, H=58)
+        // Left Tank bounds
         FluidStack fluid = recipe.getFluidRequirement();
-        if ((fluid == null || fluid.isEmpty()) && mouseX >= 4 && mouseX < 20 && mouseY >= 3 && mouseY < 61) {
+        if ((fluid == null || fluid.isEmpty()) && mouseX >= 7 && mouseX < 23 && mouseY >= 4 && mouseY < 62) {
             tooltips.add(Component.translatable("jei.afsu.recipe.no_fluid"));
         }
         return tooltips;

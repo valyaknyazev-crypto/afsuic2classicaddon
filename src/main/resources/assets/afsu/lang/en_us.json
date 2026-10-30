@@ -60,5 +60,11 @@
   "gui.afsu.jade.energy_demand": "Energy Demand: %sx",
   "gui.afsu.jade.progress": "Progress: %s / %st",
   "gui.afsu.jade.cable.conductor": "Conductor Breakdown: %s EU/t",
-  "gui.afsu.jade.cable.insulation": "Insulation Breakdown: %s EU/t"
+  "gui.afsu.jade.cable.insulation": "Insulation Breakdown: %s EU/t",
+  "fluid.afsu.waste_acid": "Waste Acid",
+  "block.afsu.waste_acid": "Waste Acid",
+  "item.afsu.waste_acid_cell": "Waste Acid Cell",
+  "fluid.afsu.toxic_sludge": "Toxic Sludge",
+  "block.afsu.toxic_sludge": "Toxic Sludge",
+  "item.afsu.toxic_sludge_cell": "Toxic Sludge Cell"
 }

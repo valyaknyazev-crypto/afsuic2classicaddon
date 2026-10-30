@@ -1,0 +1,15 @@
+{
+  "replace": false,
+  "values": [
+    "afsu:afsu_block",
+    "afsu:plasma_transformer",
+    "afsu:advanced_assembler",
+    "afsu:quantum_solar_panel",
+    "afsu:photon_solar_panel",
+    "afsu:singularity_solar_panel",
+    "afsu:absolute_solar_panel",
+    "afsu:ultra_conductor_cable",
+    "afsu:absolute_cable",
+    "afsu:super_conductor_cable"
+  ]
+}
