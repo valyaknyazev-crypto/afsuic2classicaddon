@@ -57,19 +57,35 @@ public class AdvancedAssemblerRecipe implements Recipe<Container> {
     
     @Override
     public boolean matches(Container inv, Level level) {
-        int[] invCounts = new int[6];
         ItemStack[] invStacks = new ItemStack[6];
+        int[] remainingCounts = new int[6];
         for (int i = 0; i < 6; i++) {
             invStacks[i] = inv.getItem(i);
-            invCounts[i] = invStacks[i].getCount();
+            remainingCounts[i] = invStacks[i].getCount();
         }
 
+        // Reject recipe if extraneous unmapped items exist in any input slot
+        for (int j = 0; j < 6; j++) {
+            if (invStacks[j].isEmpty()) continue;
+            boolean matchesAny = false;
+            for (IInput ing : inputs) {
+                if (ing.matches(invStacks[j])) {
+                    matchesAny = true;
+                    break;
+                }
+            }
+            if (!matchesAny) {
+                return false;
+            }
+        }
+
+        // Ensure all required ingredient quantities are fulfilled across slots
         for (IInput ing : inputs) {
             int needed = ing.getInputSize();
             for (int j = 0; j < 6; j++) {
-                if (invCounts[j] > 0 && ing.matches(invStacks[j])) {
-                    int consume = Math.min(needed, invCounts[j]);
-                    invCounts[j] -= consume;
+                if (remainingCounts[j] > 0 && ing.matches(invStacks[j])) {
+                    int consume = Math.min(needed, remainingCounts[j]);
+                    remainingCounts[j] -= consume;
                     needed -= consume;
                     if (needed <= 0) break;
                 }
@@ -78,11 +94,8 @@ public class AdvancedAssemblerRecipe implements Recipe<Container> {
                 return false;
             }
         }
-        
-        // Ensure no extra invalid items exist that don't belong to the recipe
-        // Wait, the spec says shapeless input grid, does it allow garbage in other slots?
-        // IC2 allows garbage in other slots generally, but let's just return true if all ingredients are satisfied.
-        return true; 
+
+        return true;
     }
     
     @Override

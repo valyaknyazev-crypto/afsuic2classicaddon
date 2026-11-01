@@ -100,11 +100,23 @@ public class ElectricSaberItem extends SwordItem implements IElectricItem {
     }
 
     @Override
+    public net.minecraft.world.InteractionResult useOn(net.minecraft.world.item.context.UseOnContext context) {
+        if (context.getPlayer() != null) {
+            InteractionResultHolder<ItemStack> res = use(context.getLevel(), context.getPlayer(), context.getHand());
+            return res.getResult();
+        }
+        return super.useOn(context);
+    }
+
+    @Override
     public void inventoryTick(ItemStack stack, Level worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
         if (!worldIn.isClientSide && stack.getOrCreateTag().getBoolean("active")) {
-            if (entityIn instanceof LivingEntity) {
-                if (!ElectricItem.MANAGER.use(stack, this.energyPerTick, (LivingEntity)entityIn)) {
-                    stack.getOrCreateTag().putBoolean("active", false);
+            if (entityIn instanceof LivingEntity living) {
+                boolean isHeld = isSelected || (living.getOffhandItem() == stack);
+                if (isHeld) {
+                    if (!ElectricItem.MANAGER.use(stack, this.energyPerTick, living)) {
+                        stack.getOrCreateTag().putBoolean("active", false);
+                    }
                 }
             }
         }

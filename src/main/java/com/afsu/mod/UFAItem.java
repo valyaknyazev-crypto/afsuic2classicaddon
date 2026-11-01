@@ -17,8 +17,8 @@ import java.util.List;
 public class UFAItem extends Item implements IElectricItem {
 
     public static final int MAX_CAPACITY = 100_000_000;
-    public static final int MAX_TRANSFER = 8192;
-    public static final int TIER = 1;
+    public static final int MAX_TRANSFER = 50_000;
+    public static final int TIER = 5;
 
     public UFAItem() {
         super(new Item.Properties().stacksTo(1).tab(AFSUMod.AFSU_TAB));

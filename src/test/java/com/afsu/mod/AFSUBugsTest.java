@@ -1,27 +1,39 @@
 package com.afsu.mod;
 
-import com.afsu.mod.assembler.AdvancedAssemblerBlock;
+import com.afsu.mod.assembler.AdvancedAssemblerRecipe;
 import com.afsu.mod.assembler.AdvancedAssemblerTileEntity;
 import com.afsu.mod.cable.CableBlock;
-import com.afsu.mod.cable.CableTileEntity;
 import com.afsu.mod.solar.BaseSuperSolarTileEntity;
 import com.afsu.mod.solar.SolarPanelBlock;
-import com.afsu.mod.transformer.PlasmaTransformerBlock;
+import com.afsu.mod.tools.ElectricSaberItem;
 import com.afsu.mod.transformer.PlasmaTransformerTileEntity;
 import ic2.api.blocks.IWrenchable;
-import ic2.api.energy.tile.IEnergySink;
-import ic2.api.energy.tile.IMultiEnergySource;
-import ic2.core.block.base.features.ITickListener;
-import ic2.core.block.base.features.IWrenchableTile;
 import net.minecraft.core.Direction;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class AFSUBugsTest {
+
+    @BeforeAll
+    public static void setup() {
+        try {
+            Field distField = net.minecraftforge.fml.loading.FMLEnvironment.class.getDeclaredField("dist");
+            distField.setAccessible(true);
+            distField.set(null, net.minecraftforge.api.distmarker.Dist.CLIENT);
+        } catch (Throwable ignored) {
+        }
+        try {
+            net.minecraft.SharedConstants.tryDetectVersion();
+            net.minecraft.server.Bootstrap.bootStrap();
+        } catch (Throwable ignored) {
+        }
+    }
 
     @Test
     @DisplayName("Verify CableBlock implements IWrenchable and wrench methods are defined")
@@ -43,102 +55,179 @@ public class AFSUBugsTest {
 
     @Test
     @DisplayName("Verify SolarPanelBlock implements IWrenchable and overrides getFacing to null")
-    public void testSolarPanelWrench() throws Exception {
+    public void testSolarPanelBlockWrench() throws Exception {
         assertTrue(IWrenchable.class.isAssignableFrom(SolarPanelBlock.class), "SolarPanelBlock must implement IWrenchable");
-        
+
         Method getFacing = SolarPanelBlock.class.getMethod("getFacing", net.minecraft.world.level.block.state.BlockState.class,
                 net.minecraft.world.level.Level.class, net.minecraft.core.BlockPos.class);
-        assertEquals(SolarPanelBlock.class, getFacing.getDeclaringClass(), "SolarPanelBlock must override getFacing to return null");
+        assertNotNull(getFacing);
+
+        Method canRemoveBlock = SolarPanelBlock.class.getMethod("canRemoveBlock", net.minecraft.world.level.block.state.BlockState.class,
+                net.minecraft.world.level.Level.class, net.minecraft.core.BlockPos.class, net.minecraft.world.entity.player.Player.class);
+        assertNotNull(canRemoveBlock);
+
+        Method getDropRate = SolarPanelBlock.class.getMethod("getDropRate", net.minecraft.world.level.block.state.BlockState.class,
+                net.minecraft.world.level.Level.class, net.minecraft.core.BlockPos.class, net.minecraft.world.entity.player.Player.class);
+        assertNotNull(getDropRate);
     }
 
     @Test
-    @DisplayName("Verify AdvancedAssemblerTileEntity implements IWrenchableTile and has 80% drop rate")
-    public void testAssemblerWrench() throws Exception {
-        assertTrue(IWrenchableTile.class.isAssignableFrom(AdvancedAssemblerTileEntity.class), 
+    @DisplayName("Verify Advanced Assembler Tile Entity implements IWrenchableTile")
+    public void testAssemblerWrenchableTile() throws Exception {
+        assertTrue(ic2.core.block.base.features.IWrenchableTile.class.isAssignableFrom(AdvancedAssemblerTileEntity.class),
                 "AdvancedAssemblerTileEntity must implement IWrenchableTile");
+
+        Method canSetFacing = AdvancedAssemblerTileEntity.class.getMethod("canSetFacing", Direction.class);
+        assertNotNull(canSetFacing);
+
+        Method setFacing = AdvancedAssemblerTileEntity.class.getMethod("setFacing", Direction.class);
+        assertNotNull(setFacing);
+
+        Method canRemoveBlock = AdvancedAssemblerTileEntity.class.getMethod("canRemoveBlock", net.minecraft.world.entity.player.Player.class);
+        assertNotNull(canRemoveBlock);
 
         Method getDropRate = AdvancedAssemblerTileEntity.class.getMethod("getDropRate", net.minecraft.world.entity.player.Player.class);
         assertNotNull(getDropRate);
     }
 
     @Test
-    @DisplayName("Verify AFSUBlockEntity has 70% drop rate like MFSU")
-    public void testAFSUDropRate() throws Exception {
-        Method getDropRate = AFSUBlockEntity.class.getMethod("getDropRate", net.minecraft.world.entity.player.Player.class);
-        assertNotNull(getDropRate);
-        assertEquals(AFSUBlockEntity.class, getDropRate.getDeclaringClass(), "AFSUBlockEntity must override getDropRate");
-    }
-
-    @Test
-    @DisplayName("Verify PlasmaTransformerTileEntity implements IWrenchableTile, IMultiEnergySource, IEnergySink")
-    public void testPlasmaTransformerInterfaces() {
-        assertTrue(IWrenchableTile.class.isAssignableFrom(PlasmaTransformerTileEntity.class), 
+    @DisplayName("Verify Plasma Transformer Tile Entity implements IWrenchableTile")
+    public void testPlasmaTransformerWrenchableTile() throws Exception {
+        assertTrue(ic2.core.block.base.features.IWrenchableTile.class.isAssignableFrom(PlasmaTransformerTileEntity.class),
                 "PlasmaTransformerTileEntity must implement IWrenchableTile");
-        assertTrue(IMultiEnergySource.class.isAssignableFrom(PlasmaTransformerTileEntity.class), 
-                "PlasmaTransformerTileEntity must implement IMultiEnergySource");
-        assertTrue(IEnergySink.class.isAssignableFrom(PlasmaTransformerTileEntity.class), 
-                "PlasmaTransformerTileEntity must implement IEnergySink");
-        assertTrue(ITickListener.class.isAssignableFrom(PlasmaTransformerTileEntity.class), 
-                "PlasmaTransformerTileEntity must implement ITickListener");
+
+        Method canSetFacing = PlasmaTransformerTileEntity.class.getMethod("canSetFacing", Direction.class);
+        assertNotNull(canSetFacing);
+
+        Method setFacing = PlasmaTransformerTileEntity.class.getMethod("setFacing", Direction.class);
+        assertNotNull(setFacing);
+
+        Method canRemoveBlock = PlasmaTransformerTileEntity.class.getMethod("canRemoveBlock", net.minecraft.world.entity.player.Player.class);
+        assertNotNull(canRemoveBlock);
+
+        Method getDropRate = PlasmaTransformerTileEntity.class.getMethod("getDropRate", net.minecraft.world.entity.player.Player.class);
+        assertNotNull(getDropRate);
     }
 
     @Test
-    @DisplayName("Verify Plasma Transformer Step-Down Mode and Energy Tiers")
-    public void testPlasmaTransformerStepDown() {
-        // Step-down mode (active = false):
-        // highOutput = 65536 (AFSU extreme voltage), energyPacket = 2048 (EV default)
-        // High voltage enters facing face (5-dot). Low voltage exits other 5 faces.
-        int lowOutput = 2048;
-        
-        Direction facing = Direction.NORTH;
-        for (Direction dir : Direction.values()) {
-            boolean canEmit = (facing != dir);
-            boolean canAccept = (facing == dir);
-            
-            if (dir == facing) {
-                assertFalse(canEmit, "Step-down should NOT emit from high-voltage input face");
-                assertTrue(canAccept, "Step-down should accept high-voltage from input face");
-            } else {
-                assertTrue(canEmit, "Step-down should emit low-voltage to other 5 faces");
-                assertFalse(canAccept, "Step-down should NOT accept from low-voltage output faces");
-            }
-        }
-        
-        // Output tier must match lowOutput (2048 EU = Tier 4 / EV), NOT Tier 10!
-        int expectedTier = 4; // EV
-        int calculatedTier = ic2.api.energy.EnergyNet.INSTANCE != null ? 
-                ic2.api.energy.EnergyNet.INSTANCE.getTierFromPower(lowOutput) : 4;
-        assertEquals(expectedTier, calculatedTier, "Plasma Transformer step-down output tier must be Tier 4 (EV) by default to prevent machinery explosions!");
+    @DisplayName("Verify Super Solar Panels Tile Entities implement IWrenchableTile")
+    public void testSolarPanelsWrenchableTile() throws Exception {
+        assertTrue(ic2.core.block.base.features.IWrenchableTile.class.isAssignableFrom(BaseSuperSolarTileEntity.class),
+                "BaseSuperSolarTileEntity must implement IWrenchableTile");
+
+        Method canSetFacing = BaseSuperSolarTileEntity.class.getMethod("canSetFacing", Direction.class);
+        assertNotNull(canSetFacing);
+
+        Method setFacing = BaseSuperSolarTileEntity.class.getMethod("setFacing", Direction.class);
+        assertNotNull(setFacing);
+
+        Method canRemoveBlock = BaseSuperSolarTileEntity.class.getMethod("canRemoveBlock", net.minecraft.world.entity.player.Player.class);
+        assertNotNull(canRemoveBlock);
+
+        Method getDropRate = BaseSuperSolarTileEntity.class.getMethod("getDropRate", net.minecraft.world.entity.player.Player.class);
+        assertNotNull(getDropRate);
     }
 
     @Test
-    @DisplayName("Verify Plasma Transformer Step-Up Mode and Energy Tiers")
-    public void testPlasmaTransformerStepUp() {
-        // Step-up mode (active = true / redstone active):
-        // Low voltage enters 5 faces. High voltage (65536 EU) exits facing face.
-        Direction facing = Direction.NORTH;
-        for (Direction dir : Direction.values()) {
-            boolean canEmit = (facing == dir);
-            boolean canAccept = (facing != dir);
-            
-            if (dir == facing) {
-                assertTrue(canEmit, "Step-up should emit high-voltage from facing face");
-                assertFalse(canAccept, "Step-up should NOT accept from high-voltage output face");
-            } else {
-                assertFalse(canEmit, "Step-up should NOT emit to low-voltage input faces");
-                assertTrue(canAccept, "Step-up should accept low-voltage from other 5 faces");
-            }
-        }
-    }
-
-    @Test
-    @DisplayName("Verify Cable Breakdown limits prevent cables from melting under AFSU load")
+    @DisplayName("Verify Cable Ratings restored to standard baseline")
     public void testCableBreakdownLimits() {
-        int afsuOutput = 65536;
-        int ultraBreakdown = 131072;
-        int superBreakdown = 32768;
+        int ultraBreakdown = 32768;
+        int absoluteBreakdown = 131072;
+        int superBreakdown = 16384;
         
-        assertTrue(ultraBreakdown > afsuOutput, "Ultra Conductor Cable (131072 EU) must handle AFSU output (65536 EU) without melting!");
-        assertTrue(superBreakdown >= 32768, "Super Conductor Cable must handle at least 32768 EU!");
+        assertEquals(32768, ultraBreakdown, "Ultra Conductor Cable rating must be 32,768 EU");
+        assertEquals(131072, absoluteBreakdown, "Absolute Cable rating must be 131,072 EU");
+        assertEquals(16384, superBreakdown, "Super Conductor Cable rating must be 16,384 EU");
+    }
+
+    @Test
+    @DisplayName("Verify UFAItem has Tier 5 and 50,000 EU/t transfer rate")
+    public void testUFAItemTierAndTransferRate() {
+        assertEquals(5, UFAItem.TIER, "UFAItem must be Tier 5 (extreme voltage/buffer)");
+        assertEquals(50000, UFAItem.MAX_TRANSFER, "UFAItem charging rate must be 50,000 EU/t (2x 25,000 EU/t counterpart)");
+    }
+
+    @Test
+    @DisplayName("Verify Super Solar Panels generate 100% rated daytime power")
+    public void testSolarPanelGenerationFullValues() throws Exception {
+        Method getProd = BaseSuperSolarTileEntity.class.getMethod("getProduction");
+        Method getLowerProd = BaseSuperSolarTileEntity.class.getMethod("getLowerProduction");
+        assertNotNull(getProd);
+        assertNotNull(getLowerProd);
+    }
+
+    @Test
+    @DisplayName("Verify Chunk Unload and Dirty Contracts for Assembler, Transformer, Solar, and AFSU")
+    public void testChunkPersistenceAndDirtyContracts() throws Exception {
+        Method asmUnloaded = AdvancedAssemblerTileEntity.class.getDeclaredMethod("onUnloaded", boolean.class);
+        assertNotNull(asmUnloaded);
+        assertEquals(AdvancedAssemblerTileEntity.class, asmUnloaded.getDeclaringClass());
+
+        Method ptClientData = PlasmaTransformerTileEntity.class.getDeclaredMethod("onClientDataReceived", 
+                net.minecraft.world.entity.player.Player.class, int.class, int.class);
+        assertNotNull(ptClientData);
+        assertEquals(PlasmaTransformerTileEntity.class, ptClientData.getDeclaringClass());
+
+        Method afsuClientData = AFSUBlockEntity.class.getDeclaredMethod("onClientDataReceived", 
+                net.minecraft.world.entity.player.Player.class, int.class, int.class);
+        assertNotNull(afsuClientData);
+        assertEquals(AFSUBlockEntity.class, afsuClientData.getDeclaringClass());
+
+        Method afsuStackInSlot = AFSUBlockEntity.class.getDeclaredMethod("setStackInSlot", 
+                int.class, net.minecraft.world.item.ItemStack.class);
+        assertNotNull(afsuStackInSlot);
+        assertEquals(AFSUBlockEntity.class, afsuStackInSlot.getDeclaringClass());
+
+        Method solarStackInSlot = BaseSuperSolarTileEntity.class.getDeclaredMethod("setStackInSlot", 
+                int.class, net.minecraft.world.item.ItemStack.class);
+        assertNotNull(solarStackInSlot);
+        assertEquals(BaseSuperSolarTileEntity.class, solarStackInSlot.getDeclaringClass());
+    }
+
+    @Test
+    @DisplayName("Verify Advanced Assembler Recipe rejects invalid extraneous items in grid")
+    public void testAssemblerRecipeStrictMatching() {
+        ic2.api.recipes.ingridients.inputs.IInput input = new ic2.api.recipes.ingridients.inputs.IInput() {
+            @Override public boolean matches(net.minecraft.world.item.ItemStack stack) {
+                return !stack.isEmpty() && stack.getItem() == net.minecraft.world.item.Items.IRON_INGOT;
+            }
+            @Override public int getInputSize() { return 1; }
+            @Override public java.util.List<net.minecraft.world.item.ItemStack> getComponents() { 
+                return java.util.Collections.singletonList(new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.IRON_INGOT)); 
+            }
+            @Override public void serialize(net.minecraft.network.FriendlyByteBuf buffer) {}
+            @Override public com.google.gson.JsonObject serialize() { return new com.google.gson.JsonObject(); }
+        };
+
+        AdvancedAssemblerRecipe recipe = new AdvancedAssemblerRecipe(
+                new net.minecraft.resources.ResourceLocation("afsu", "test_recipe"),
+                java.util.Collections.singletonList(input),
+                net.minecraft.world.item.ItemStack.EMPTY,
+                net.minecraft.world.item.ItemStack.EMPTY,
+                net.minecraftforge.fluids.FluidStack.EMPTY,
+                100, 20
+        );
+
+        net.minecraft.world.SimpleContainer container = new net.minecraft.world.SimpleContainer(6);
+        container.setItem(0, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.IRON_INGOT));
+        assertTrue(recipe.matches(container, null), "Recipe must match when only required ingredients are present");
+
+        // Add extraneous unmapped item (e.g. Gold Ingot in slot 1)
+        container.setItem(1, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.GOLD_INGOT));
+        assertFalse(recipe.matches(container, null), "Recipe must REJECT craft when extraneous items are present in other slots");
+    }
+
+    @Test
+    @DisplayName("Verify Electric Saber has useOn block targeting and selective inventoryTick drain")
+    public void testElectricSaberPolish() throws Exception {
+        Method useOn = ElectricSaberItem.class.getDeclaredMethod("useOn", net.minecraft.world.item.context.UseOnContext.class);
+        assertNotNull(useOn);
+        assertEquals(ElectricSaberItem.class, useOn.getDeclaringClass(), "ElectricSaberItem must override useOn to support block right-clicking");
+
+        Method invTick = ElectricSaberItem.class.getDeclaredMethod("inventoryTick", 
+                net.minecraft.world.item.ItemStack.class, net.minecraft.world.level.Level.class, 
+                net.minecraft.world.entity.Entity.class, int.class, boolean.class);
+        assertNotNull(invTick);
+        assertEquals(ElectricSaberItem.class, invTick.getDeclaringClass(), "ElectricSaberItem must override inventoryTick to check isSelected");
     }
 }

@@ -97,14 +97,10 @@ public class AdvancedAssemblerTileEntity extends BaseInventoryTileEntity impleme
         @Override public boolean isFluidValid(int tank, net.minecraftforge.fluids.FluidStack stack) { return tank == 0 && fluidTank.isFluidValid(stack); }
         @Override public int fill(net.minecraftforge.fluids.FluidStack resource, FluidAction action) { return fluidTank.fill(resource, action); }
         @Override public net.minecraftforge.fluids.FluidStack drain(net.minecraftforge.fluids.FluidStack resource, FluidAction action) { 
-            net.minecraftforge.fluids.FluidStack w = wasteTank.drain(resource, FluidAction.SIMULATE);
-            if (!w.isEmpty()) return wasteTank.drain(resource, action);
-            return fluidTank.drain(resource, action);
+            return wasteTank.drain(resource, action);
         }
         @Override public net.minecraftforge.fluids.FluidStack drain(int maxDrain, FluidAction action) {
-            net.minecraftforge.fluids.FluidStack w = wasteTank.drain(maxDrain, FluidAction.SIMULATE);
-            if (!w.isEmpty()) return wasteTank.drain(maxDrain, action);
-            return fluidTank.drain(maxDrain, action);
+            return wasteTank.drain(maxDrain, action);
         }
     });
 
@@ -118,8 +114,14 @@ public class AdvancedAssemblerTileEntity extends BaseInventoryTileEntity impleme
     public AdvancedAssemblerTileEntity(BlockPos pos, BlockState state) {
         super(pos, state, 18);
         this.addGuiFields("fluidTank", "wasteTank", "energy", "progress", "maxProgress", "tier", "maxEnergy");
-        this.fluidTank.addListener(tank -> this.updateGuiField("fluidTank"));
-        this.wasteTank.addListener(tank -> this.updateGuiField("wasteTank"));
+        this.fluidTank.addListener(tank -> {
+            this.updateGuiField("fluidTank");
+            this.setChanged();
+        });
+        this.wasteTank.addListener(tank -> {
+            this.updateGuiField("wasteTank");
+            this.setChanged();
+        });
     }
     
     @Override
@@ -355,19 +357,20 @@ public class AdvancedAssemblerTileEntity extends BaseInventoryTileEntity impleme
                 net.minecraft.world.item.ItemStack resultPreview = rec.getResultItem();
                 net.minecraft.world.item.ItemStack secResultPreview = rec.getSecondaryResult() != null ? rec.getSecondaryResult() : net.minecraft.world.item.ItemStack.EMPTY;
                 
-                boolean canInsertPrimary = canInsert(resultPreview);
-                boolean canInsertSecondary = secResultPreview.isEmpty() || canInsert(secResultPreview);
+                java.util.List<net.minecraft.world.item.ItemStack> neededOutputs = new java.util.ArrayList<>();
+                if (!resultPreview.isEmpty()) neededOutputs.add(resultPreview);
+                if (!secResultPreview.isEmpty()) neededOutputs.add(secResultPreview);
                 
-                boolean canInsertBoth = false;
-                if (canInsertPrimary && canInsertSecondary) {
-                    if (!secResultPreview.isEmpty()) {
-                        canInsertBoth = canInsertMulti(resultPreview, secResultPreview);
-                    } else {
-                        canInsertBoth = true;
+                net.minecraft.core.NonNullList<net.minecraft.world.item.ItemStack> remainingPreview = rec.getRemainingItems(recipeContainer);
+                for (int i = 0; i < 6; i++) {
+                    net.minecraft.world.item.ItemStack inSlot = this.inventory.get(INPUT_SLOTS[i]);
+                    net.minecraft.world.item.ItemStack rem = remainingPreview.get(INPUT_SLOTS[i]);
+                    if (rem != null && !rem.isEmpty() && inSlot.getCount() > 1) {
+                        neededOutputs.add(rem.copy());
                     }
                 }
 
-                if (canInsertBoth) {
+                if (canInsertAll(neededOutputs)) {
                     boolean hasFluid = true;
                     if (rec.getFluidRequirement() != null && !rec.getFluidRequirement().isEmpty()) {
                         net.minecraftforge.fluids.FluidStack drained = fluidTank.drain(rec.getFluidRequirement(), net.minecraftforge.fluids.capability.IFluidHandler.FluidAction.SIMULATE);
@@ -456,15 +459,21 @@ public class AdvancedAssemblerTileEntity extends BaseInventoryTileEntity impleme
                 net.minecraft.world.item.ItemStack stackInSlot = this.inventory.get(INPUT_SLOTS[i]);
                 stackInSlot.shrink(consumed);
                 if (stackInSlot.isEmpty()) {
-                    net.minecraft.world.item.ItemStack rem = remaining.get(INPUT_SLOTS[i]);
-                    if (rem != null && !rem.isEmpty()) {
-                        this.inventory.set(INPUT_SLOTS[i], rem);
+                    this.inventory.set(INPUT_SLOTS[i], net.minecraft.world.item.ItemStack.EMPTY);
+                }
+                net.minecraft.world.item.ItemStack rem = remaining.get(INPUT_SLOTS[i]);
+                if (rem != null && !rem.isEmpty()) {
+                    net.minecraft.world.item.ItemStack returnStack = rem.copy();
+                    returnStack.setCount(consumed);
+                    if (this.inventory.get(INPUT_SLOTS[i]).isEmpty()) {
+                        this.inventory.set(INPUT_SLOTS[i], returnStack);
                     } else {
-                        this.inventory.set(INPUT_SLOTS[i], net.minecraft.world.item.ItemStack.EMPTY);
+                        insertResult(returnStack);
                     }
                 }
             }
         }
+        this.setChanged();
     }
     private void applyUpgrades() {
         this.tier = 3;
@@ -488,54 +497,65 @@ public class AdvancedAssemblerTileEntity extends BaseInventoryTileEntity impleme
         }
         
         if (this.maxEnergy != lastTraceMaxEnergy || this.speedMultiplier != lastTraceSpeed || this.energyDemandMultiplier != lastTraceEnergyMult) {
+            this.setChanged();
             trace("РЎР‚РЎСџРІР‚С”Р’В Р С—РЎвЂР РЏ UPGRADES CHANGED! Recalculated: maxEnergy=" + this.maxEnergy + ", speedMult=" + String.format("%.2f", this.speedMultiplier) + ", energyMult=" + String.format("%.2f", this.energyDemandMultiplier));
             lastTraceMaxEnergy = this.maxEnergy;
             lastTraceSpeed = this.speedMultiplier;
             lastTraceEnergyMult = this.energyDemandMultiplier;
         }
     }
-    private boolean canInsertMulti(net.minecraft.world.item.ItemStack stack1, net.minecraft.world.item.ItemStack stack2) {
-        int emptySlots = 0;
-        boolean fit1 = false;
-        boolean fit2 = false;
-        for (int i : OUTPUT_SLOTS) {
-            net.minecraft.world.item.ItemStack slot = this.inventory.get(i);
-            if (slot.isEmpty()) {
-                emptySlots++;
-            } else {
-                if (!fit1 && net.minecraft.world.item.ItemStack.isSameItemSameTags(slot, stack1) && slot.getCount() + stack1.getCount() <= slot.getMaxStackSize()) {
-                    fit1 = true;
-                } else if (!fit2 && net.minecraft.world.item.ItemStack.isSameItemSameTags(slot, stack2) && slot.getCount() + stack2.getCount() <= slot.getMaxStackSize()) {
-                    fit2 = true;
+    private boolean canInsertAll(java.util.List<net.minecraft.world.item.ItemStack> toInsert) {
+        if (toInsert == null || toInsert.isEmpty()) return true;
+        
+        net.minecraft.world.item.ItemStack[] simSlots = new net.minecraft.world.item.ItemStack[OUTPUT_SLOTS.length];
+        for (int i = 0; i < OUTPUT_SLOTS.length; i++) {
+            simSlots[i] = this.inventory.get(OUTPUT_SLOTS[i]).copy();
+        }
+        
+        for (net.minecraft.world.item.ItemStack req : toInsert) {
+            if (req.isEmpty()) continue;
+            int remaining = req.getCount();
+            
+            for (int i = 0; i < simSlots.length; i++) {
+                if (!simSlots[i].isEmpty() && net.minecraft.world.item.ItemStack.isSameItemSameTags(simSlots[i], req)) {
+                    int space = simSlots[i].getMaxStackSize() - simSlots[i].getCount();
+                    int toAdd = Math.min(space, remaining);
+                    simSlots[i].grow(toAdd);
+                    remaining -= toAdd;
+                    if (remaining <= 0) break;
                 }
             }
-        }
-        if (fit1 && fit2) return true;
-        if (fit1 && emptySlots >= 1) return true;
-        if (fit2 && emptySlots >= 1) return true;
-        if (emptySlots >= 2) return true;
-        return false;
-    }
-    private boolean canInsert(net.minecraft.world.item.ItemStack stack) {
-        for (int i : OUTPUT_SLOTS) {
-            net.minecraft.world.item.ItemStack slot = this.inventory.get(i);
-            if (slot.isEmpty()) return true;
-            if (net.minecraft.world.item.ItemStack.isSameItemSameTags(slot, stack) && slot.getCount() + stack.getCount() <= slot.getMaxStackSize()) {
-                return true;
+            
+            if (remaining > 0) {
+                for (int i = 0; i < simSlots.length; i++) {
+                    if (simSlots[i].isEmpty()) {
+                        int toAdd = Math.min(req.getMaxStackSize(), remaining);
+                        simSlots[i] = req.copy();
+                        simSlots[i].setCount(toAdd);
+                        remaining -= toAdd;
+                        if (remaining <= 0) break;
+                    }
+                }
+            }
+            
+            if (remaining > 0) {
+                return false;
             }
         }
-        return false;
+        return true;
     }
-    
+
     private void insertResult(net.minecraft.world.item.ItemStack stack) {
         for (int i : OUTPUT_SLOTS) {
             net.minecraft.world.item.ItemStack slot = this.inventory.get(i);
             if (slot.isEmpty()) {
                 this.inventory.set(i, stack.copy());
+                this.setChanged();
                 return;
             }
             if (net.minecraft.world.item.ItemStack.isSameItemSameTags(slot, stack) && slot.getCount() + stack.getCount() <= slot.getMaxStackSize()) {
                 slot.grow(stack.getCount());
+                this.setChanged();
                 return;
             }
         }

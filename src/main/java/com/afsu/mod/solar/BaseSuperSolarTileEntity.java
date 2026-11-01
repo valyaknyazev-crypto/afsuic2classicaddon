@@ -47,7 +47,7 @@ public abstract class BaseSuperSolarTileEntity extends BaseGeneratorTileEntity i
     public BaseSuperSolarTileEntity(BlockPos pos, BlockState state, int generation, int maxStorage, int tier) {
         super(pos, state, tier);
         this.maxOutput = generation;
-        this.production = generation / 2;
+        this.production = generation;
         this.lowerProduction = this.production / 8;
         this.maxStorage = maxStorage;
         this.tier = tier;
@@ -157,8 +157,12 @@ public abstract class BaseSuperSolarTileEntity extends BaseGeneratorTileEntity i
         resetEmitIfNewTick();
         if (this.level != null && !this.level.isClientSide()) {
             if (this.clock(64)) {
+                boolean oldDay = this.day;
                 this.day = isSunVisible();
-                this.updateGuiField("day");
+                if (oldDay != this.day) {
+                    this.updateGuiField("day");
+                    this.setChanged();
+                }
             }
             
             int oldEnergy = this.storage;
@@ -188,8 +192,17 @@ public abstract class BaseSuperSolarTileEntity extends BaseGeneratorTileEntity i
                 if (this.clock(4) || this.storage == 0 || this.storage == this.maxStorage) {
                     this.updateGuiField("storage");
                 }
+                if (this.clock(128)) {
+                    this.setChanged();
+                }
             }
         }
+    }
+
+    @Override
+    public void setStackInSlot(int slot, ItemStack stack) {
+        super.setStackInSlot(slot, stack);
+        this.setChanged();
     }
     
     @Override

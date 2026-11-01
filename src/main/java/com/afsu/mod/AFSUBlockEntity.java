@@ -3,9 +3,9 @@ package com.afsu.mod;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.core.Direction;
 
 import com.afsu.mod.tools.IDebuggableMachine;
 import java.util.List;
@@ -42,8 +42,8 @@ public class AFSUBlockEntity extends DirectionalEnergyStorageTileEntity implemen
     }
 
     @Override
-    public net.minecraft.network.chat.Component getDisplayName() {
-        return net.minecraft.network.chat.Component.translatable("block.afsu.afsu_block");
+    public Component getDisplayName() {
+        return Component.translatable("block.afsu.afsu_block");
     }
 
     @Override
@@ -52,8 +52,22 @@ public class AFSUBlockEntity extends DirectionalEnergyStorageTileEntity implemen
     }
     
     @Override
-    public ic2.core.inventory.container.IC2Container createContainer(net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand, net.minecraft.core.Direction side, int id) {
+    public ic2.core.inventory.container.IC2Container createContainer(Player player, net.minecraft.world.InteractionHand hand, net.minecraft.core.Direction side, int id) {
         return new ic2.core.block.storage.container.ContainerEnergyStorage(this, player, id);
+    }
+
+    @Override
+    public void onClientDataReceived(Player player, int key, int value) {
+        super.onClientDataReceived(player, key, value);
+        if (key == 0) {
+            this.setChanged();
+        }
+    }
+
+    @Override
+    public void setStackInSlot(int slot, ItemStack stack) {
+        super.setStackInSlot(slot, stack);
+        this.setChanged();
     }
 
     @Override

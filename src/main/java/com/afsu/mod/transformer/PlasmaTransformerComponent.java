@@ -18,8 +18,7 @@ import java.util.Set;
 
 public class PlasmaTransformerComponent extends GuiWidget {
     
-    public static final String[] TIERS = new String[]{"HV", "EV", "IV", "LuV", "EXT"};
-    public static final int[] TIER_VALUES = new int[]{512, 2048, 8192, 32768, 65536};
+    public static final String[] TIERS = new String[]{"LuV", "ZPM", "UV", "UHV", "UEV", "UIV", "MAX"};
     PlasmaTransformerTileEntity tile;
     int lastPacket;
     int lastEnergy;
@@ -59,12 +58,12 @@ public class PlasmaTransformerComponent extends GuiWidget {
         confirmBtn.active = false;
         gui.addRenderableWidget(4, confirmBtn);
         
-        int xOffset = 18;
+        int xOffset = 13;
         for (int i = 0; i < TIERS.length; ++i) {
             int index = i;
-            int extra = gui.getFont().width(TIERS[i]) + 8;
+            int extra = gui.getFont().width(TIERS[i]) + 6;
             gui.addRenderableWidget(new ExtendedButton(x + xOffset, y + 55, extra, 12, this.string(TIERS[i]), T -> this.sendTier(index)));
-            xOffset += extra + 4;
+            xOffset += extra + 3;
         }
     }
 
@@ -80,9 +79,9 @@ public class PlasmaTransformerComponent extends GuiWidget {
     @Override
     public void tick(IC2Screen gui) {
         gui.getButton(0).active = this.tile.packetCount < 32;
-        gui.getButton(1).active = this.tile.energyPacket < 65536;
+        gui.getButton(1).active = this.tile.energyPacket < 2097152;
         gui.getButton(2).active = this.tile.packetCount > 1;
-        gui.getButton(3).active = this.tile.energyPacket > 512;
+        gui.getButton(3).active = this.tile.energyPacket > 128;
         gui.getButton(4).active = this.tile.energyPacket != this.lastEnergy || this.tile.packetCount != this.lastPacket;
     }
 
@@ -93,9 +92,9 @@ public class PlasmaTransformerComponent extends GuiWidget {
     }
 
     public void sendTier(int tierIndex) {
-        if (tierIndex >= 0 && tierIndex < TIER_VALUES.length) {
-            this.tile.energyPacket = TIER_VALUES[tierIndex];
-        }
+        // Tiers: 32768 * (2 ^ tierIndex)
+        int power = 32768 * (int)Math.pow(2, tierIndex);
+        this.tile.energyPacket = power;
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -104,7 +103,7 @@ public class PlasmaTransformerComponent extends GuiWidget {
         if (Screen.hasShiftDown()) effect *= 100;
         if (Screen.hasAltDown()) effect *= 1000;
         
-        this.tile.energyPacket = Mth.clamp(this.tile.energyPacket + effect, 512, 65536);
+        this.tile.energyPacket = Mth.clamp(this.tile.energyPacket + effect, 128, 2097152);
     }
 
     @OnlyIn(Dist.CLIENT)

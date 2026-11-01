@@ -103,67 +103,6 @@ public class AFSUMod {
     }
 
     private void clientSetup(final net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent event) {
-        event.enqueueWork(() -> {
-
-            net.minecraft.client.renderer.item.ItemProperties.register(AFSUItems.UFA_ITEM.get(), new ResourceLocation(MODID, "charge"),
-                (stack, level, entity, seed) -> {
-                    int capacity = ic2.api.items.electric.ElectricItem.MANAGER.getCapacity(stack);
-                    int charge = ic2.api.items.electric.ElectricItem.MANAGER.getCharge(stack);
-                    if (capacity == 0) return 0.0f;
-                    float ratio = (float) charge / capacity;
-                    
-                    if (ratio > 0.875f) return 1.0f;
-                    if (ratio > 0.625f) return 0.75f;
-                    if (ratio > 0.375f) return 0.50f;
-                    if (ratio > 0.125f) return 0.25f;
-                    return 0.0f;
-                });
-            net.minecraft.client.renderer.item.ItemProperties.register(AFSUItems.ADVANCED_SABER.get(), new ResourceLocation(MODID, "active_frame"),
-                (stack, level, entity, seed) -> {
-                    if (!stack.getOrCreateTag().getBoolean("active")) return 0.0F;
-                    
-                    long activationTime = stack.getOrCreateTag().getLong("activation_time");
-                    if (activationTime == 0 && level != null) {
-                        activationTime = level.getGameTime();
-                        stack.getOrCreateTag().putLong("activation_time", activationTime);
-                    }
-                    
-                    if (level == null) return 0.0F;
-                    
-                    long diff = level.getGameTime() - activationTime;
-                    int frame = 0;
-                    
-                    if (diff < 27) {
-                        frame = (int) (diff / 3);
-                    } else {
-                        frame = 9 + (int)((diff - 27) % 2);
-                    }
-                    
-                    return frame + 1.0F;
-                });
-            net.minecraft.client.renderer.item.ItemProperties.register(AFSUItems.QUANTUM_SABER.get(), new ResourceLocation(MODID, "active_frame"),
-                (stack, level, entity, seed) -> {
-                    if (!stack.getOrCreateTag().getBoolean("active")) return 0.0F;
-                    
-                    long activationTime = stack.getOrCreateTag().getLong("activation_time");
-                    if (activationTime == 0 && level != null) {
-                        activationTime = level.getGameTime();
-                        stack.getOrCreateTag().putLong("activation_time", activationTime);
-                    }
-                    
-                    if (level == null) return 0.0F;
-                    
-                    long diff = level.getGameTime() - activationTime;
-                    int frame = 0;
-                    
-                    if (diff < 27) {
-                        frame = (int) (diff / 3);
-                    } else {
-                        frame = 9 + (int)((diff - 27) % 2);
-                    }
-                    
-                    return frame + 1.0F;
-                });
-        });
+        com.afsu.mod.client.AFSUClientSetup.init(event);
     }
 }

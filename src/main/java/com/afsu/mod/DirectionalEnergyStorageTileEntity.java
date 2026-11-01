@@ -14,6 +14,14 @@ public abstract class DirectionalEnergyStorageTileEntity extends BaseEnergyStora
     }
 
     @Override
+    public Direction getFacing() {
+        if (this.hasLevel() && this.getBlockState().hasProperty(BlockStateProperties.FACING)) {
+            return this.getBlockState().getValue(BlockStateProperties.FACING);
+        }
+        return super.getFacing();
+    }
+
+    @Override
     public void onLoaded() {
         if (this.hasLevel() && this.getBlockState().hasProperty(BlockStateProperties.FACING)) {
             this.setFacingSilent(this.getBlockState().getValue(BlockStateProperties.FACING));
@@ -22,10 +30,10 @@ public abstract class DirectionalEnergyStorageTileEntity extends BaseEnergyStora
     }
 
     @Override
-    public void setFacing(Direction direction) {
-        super.setFacing(direction);
-        if (this.level != null && !this.level.isClientSide) {
-            this.level.setBlockAndUpdate(this.worldPosition, this.getBlockState().setValue(BlockStateProperties.FACING, direction));
+    public void setFacing(Direction facing) {
+        super.setFacing(facing);
+        if (this.hasLevel() && !this.level.isClientSide) {
+            this.level.setBlockAndUpdate(this.worldPosition, this.getBlockState().setValue(BlockStateProperties.FACING, facing));
         }
     }
 }
