@@ -131,13 +131,13 @@ public class AFSUBugsTest {
     @Test
     @DisplayName("Verify Cable Ratings restored to standard baseline")
     public void testCableBreakdownLimits() {
-        int ultraBreakdown = 32768;
-        int absoluteBreakdown = 131072;
-        int superBreakdown = 16384;
-        
-        assertEquals(32768, ultraBreakdown, "Ultra Conductor Cable rating must be 32,768 EU");
-        assertEquals(131072, absoluteBreakdown, "Absolute Cable rating must be 131,072 EU");
-        assertEquals(16384, superBreakdown, "Super Conductor Cable rating must be 16,384 EU");
+        com.afsu.mod.cable.CableTileEntity ultra = new com.afsu.mod.cable.CableTileEntity(null, net.minecraft.core.BlockPos.ZERO, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 0.01, 32768);
+        com.afsu.mod.cable.CableTileEntity absolute = new com.afsu.mod.cable.CableTileEntity(null, net.minecraft.core.BlockPos.ZERO, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 0.0, 131072);
+        com.afsu.mod.cable.CableTileEntity superCond = new com.afsu.mod.cable.CableTileEntity(null, net.minecraft.core.BlockPos.ZERO, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 0.5, 16384);
+
+        assertEquals(32768, ultra.getConductorBreakdownEnergy(), "Ultra Conductor Cable rating must be 32,768 EU");
+        assertEquals(131072, absolute.getConductorBreakdownEnergy(), "Absolute Cable rating must be 131,072 EU");
+        assertEquals(16384, superCond.getConductorBreakdownEnergy(), "Super Conductor Cable rating must be 16,384 EU");
     }
 
     @Test
@@ -229,5 +229,22 @@ public class AFSUBugsTest {
                 net.minecraft.world.entity.Entity.class, int.class, boolean.class);
         assertNotNull(invTick);
         assertEquals(ElectricSaberItem.class, invTick.getDeclaringClass(), "ElectricSaberItem must override inventoryTick to check isSelected");
+    }
+
+
+    @Test
+    @DisplayName("Verify Electric Saber client frame calculation is read-only and handles GUI contexts")
+    public void testSaberFrameCalculation() {
+        net.minecraft.world.item.ItemStack inactiveStack = new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.DIAMOND_SWORD);
+        boolean hadTag = inactiveStack.hasTag();
+        float inactiveFrame = com.afsu.mod.client.AFSUClientSetup.calculateSaberFrame(inactiveStack, null, null);
+        assertEquals(0.0F, inactiveFrame, "Inactive saber must return 0.0F");
+        assertEquals(hadTag, inactiveStack.hasTag(), "Calling calculateSaberFrame must not modify NBT tag");
+
+        net.minecraft.world.item.ItemStack activeStack = new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.DIAMOND_SWORD);
+        activeStack.getOrCreateTag().putBoolean("active", true);
+        float activeFrameNoLevel = com.afsu.mod.client.AFSUClientSetup.calculateSaberFrame(activeStack, null, null);
+        assertTrue(activeFrameNoLevel >= 10.0F, "Active saber in GUI with null level must return extended blade (>= 10.0F)");
+        assertFalse(activeStack.getTag().contains("activation_time"), "Frame calculation must NOT mutate NBT by injecting activation_time on render thread");
     }
 }

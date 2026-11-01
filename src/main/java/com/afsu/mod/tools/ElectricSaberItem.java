@@ -54,6 +54,10 @@ public class ElectricSaberItem extends SwordItem implements IElectricItem {
         this.inactiveModifiers = inactive.build();
     }
 
+    public static boolean isActive(ItemStack stack) {
+        return stack.hasTag() && stack.getTag().getBoolean("active");
+    }
+
     @Override
     public boolean canProvideEnergy(ItemStack itemStack) {
         return false;
@@ -110,7 +114,7 @@ public class ElectricSaberItem extends SwordItem implements IElectricItem {
 
     @Override
     public void inventoryTick(ItemStack stack, Level worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
-        if (!worldIn.isClientSide && stack.hasTag() && stack.getTag().getBoolean("active")) {
+        if (!worldIn.isClientSide && isActive(stack)) {
             if (entityIn instanceof LivingEntity living) {
                 boolean isHeld = isSelected || (living.getOffhandItem() == stack);
                 if (isHeld) {
@@ -124,7 +128,7 @@ public class ElectricSaberItem extends SwordItem implements IElectricItem {
 
     @Override
     public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
-        if (stack.hasTag() && stack.getTag().getBoolean("active")) {
+        if (isActive(stack)) {
             if (!ElectricItem.MANAGER.use(stack, this.energyPerHit, attacker)) {
                 stack.getTag().putBoolean("active", false);
             }
@@ -135,7 +139,7 @@ public class ElectricSaberItem extends SwordItem implements IElectricItem {
     @Override
     public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot equipmentSlot, ItemStack stack) {
         if (equipmentSlot == EquipmentSlot.MAINHAND) {
-            boolean active = stack.hasTag() && stack.getTag().getBoolean("active");
+            boolean active = isActive(stack);
             return active ? this.activeModifiers : this.inactiveModifiers;
         }
         return HashMultimap.create();
@@ -145,8 +149,8 @@ public class ElectricSaberItem extends SwordItem implements IElectricItem {
     public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
         if (slotChanged) return true;
         if (oldStack.getItem() != newStack.getItem()) return true;
-        boolean oldActive = oldStack.hasTag() && oldStack.getTag().getBoolean("active");
-        boolean newActive = newStack.hasTag() && newStack.getTag().getBoolean("active");
+        boolean oldActive = isActive(oldStack);
+        boolean newActive = isActive(newStack);
         return oldActive != newActive;
     }
 

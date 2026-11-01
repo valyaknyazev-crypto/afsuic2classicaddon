@@ -61,9 +61,9 @@ public class PlasmaTransformerComponent extends GuiWidget {
         int xOffset = 13;
         for (int i = 0; i < TIERS.length; ++i) {
             int index = i;
-            int extra = gui.getFont().width(TIERS[i]) + 6;
-            gui.addRenderableWidget(new ExtendedButton(x + xOffset, y + 55, extra, 12, this.string(TIERS[i]), T -> this.sendTier(index)));
-            xOffset += extra + 3;
+            int buttonWidth = gui.getFont().width(TIERS[i]) + 6;
+            gui.addRenderableWidget(new ExtendedButton(x + xOffset, y + 55, buttonWidth, 12, this.string(TIERS[i]), T -> this.sendTier(index)));
+            xOffset += buttonWidth + 3;
         }
     }
 
@@ -81,7 +81,7 @@ public class PlasmaTransformerComponent extends GuiWidget {
         gui.getButton(0).active = this.tile.packetCount < 32;
         gui.getButton(1).active = this.tile.energyPacket < 2097152;
         gui.getButton(2).active = this.tile.packetCount > 1;
-        gui.getButton(3).active = this.tile.energyPacket > 128;
+        gui.getButton(3).active = this.tile.energyPacket > 32768;
         gui.getButton(4).active = this.tile.energyPacket != this.lastEnergy || this.tile.packetCount != this.lastPacket;
     }
 
@@ -103,7 +103,7 @@ public class PlasmaTransformerComponent extends GuiWidget {
         if (Screen.hasShiftDown()) effect *= 100;
         if (Screen.hasAltDown()) effect *= 1000;
         
-        this.tile.energyPacket = Mth.clamp(this.tile.energyPacket + effect, 128, 2097152);
+        this.tile.energyPacket = Mth.clamp(this.tile.energyPacket + effect, 32768, 2097152);
     }
 
     @OnlyIn(Dist.CLIENT)

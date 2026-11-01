@@ -83,7 +83,7 @@ public class PlasmaTransformerTileEntity extends BaseTileEntity implements IMult
             this.setChanged();
         }
         if (key == 1) {
-            this.energyPacket = Mth.clamp(value, 128, 2097152);
+            this.energyPacket = Mth.clamp(value, 32768, 2097152);
             this.maxEnergy = this.energyPacket * 32;
             this.updateGuiFields(new String[]{"energyPacket", "maxEnergy"});
             if (this.addedToEnergyNet) {

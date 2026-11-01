@@ -2,9 +2,14 @@ package com.afsu.mod.client;
 
 import com.afsu.mod.AFSUMod;
 import com.afsu.mod.registry.AFSUItems;
+import com.afsu.mod.tools.ElectricSaberItem;
 import ic2.api.items.electric.ElectricItem;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -28,30 +33,34 @@ public class AFSUClientSetup {
                 });
 
             ItemProperties.register(AFSUItems.ADVANCED_SABER.get(), new ResourceLocation(AFSUMod.MODID, "active_frame"),
-                (stack, level, entity, seed) -> calculateSaberFrame(stack, level));
+                (stack, level, entity, seed) -> calculateSaberFrame(stack, level, entity));
 
             ItemProperties.register(AFSUItems.QUANTUM_SABER.get(), new ResourceLocation(AFSUMod.MODID, "active_frame"),
-                (stack, level, entity, seed) -> calculateSaberFrame(stack, level));
+                (stack, level, entity, seed) -> calculateSaberFrame(stack, level, entity));
         });
     }
 
-    private static float calculateSaberFrame(net.minecraft.world.item.ItemStack stack, net.minecraft.client.multiplayer.ClientLevel level) {
-        if (!stack.hasTag() || !stack.getTag().getBoolean("active")) return 0.0F;
-        if (level == null) return 0.0F;
+    public static float calculateSaberFrame(ItemStack stack, ClientLevel level, LivingEntity entity) {
+        if (!ElectricSaberItem.isActive(stack)) return 0.0F;
 
-        long activationTime = stack.getTag().getLong("activation_time");
-        if (activationTime <= 0) return 1.0F;
+        Minecraft mc = Minecraft.getInstance();
+        ClientLevel clientLevel = level != null ? level : (entity != null && entity.level instanceof ClientLevel cl ? cl : (mc != null ? mc.level : null));
+        if (clientLevel == null) return 10.0F;
 
-        long diff = level.getGameTime() - activationTime;
-        if (diff < 0) diff = 0;
-
-        int frame;
-        if (diff < 27) {
-            frame = (int) (diff / 3);
-        } else {
-            frame = 9 + (int) ((diff - 27) % 2);
+        // In hand: play blade opening animation if newly turned on
+        if (entity != null) {
+            long activationTime = stack.getTag().getLong("activation_time");
+            if (activationTime > 0) {
+                long diff = clientLevel.getGameTime() - activationTime;
+                if (diff >= 0 && diff < 27) {
+                    return (float) (diff / 3) + 1.0F;
+                }
+            }
         }
 
-        return frame + 1.0F;
+        // In inventory/GUI (or in hand once fully extended): smoothly pulsate between active frames 9 and 10 (overrides 10.0 and 11.0)
+        // Pulsate every 2 ticks (~100 ms)
+        int pulse = (int) ((clientLevel.getGameTime() / 2) % 2);
+        return 10.0F + pulse;
     }
 }

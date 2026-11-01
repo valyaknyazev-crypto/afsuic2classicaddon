@@ -546,15 +546,29 @@ public class AdvancedAssemblerTileEntity extends BaseInventoryTileEntity impleme
     }
 
     private void insertResult(net.minecraft.world.item.ItemStack stack) {
+        if (stack.isEmpty()) return;
+        net.minecraft.world.item.ItemStack remaining = stack.copy();
+
+        // Pass 1: Try stacking into existing non-empty output slots
+        for (int i : OUTPUT_SLOTS) {
+            net.minecraft.world.item.ItemStack slot = this.inventory.get(i);
+            if (!slot.isEmpty() && net.minecraft.world.item.ItemStack.isSameItemSameTags(slot, remaining)) {
+                int space = slot.getMaxStackSize() - slot.getCount();
+                if (space > 0) {
+                    int toAdd = Math.min(space, remaining.getCount());
+                    slot.grow(toAdd);
+                    remaining.shrink(toAdd);
+                    this.setChanged();
+                    if (remaining.isEmpty()) return;
+                }
+            }
+        }
+
+        // Pass 2: Place remainder into empty output slots
         for (int i : OUTPUT_SLOTS) {
             net.minecraft.world.item.ItemStack slot = this.inventory.get(i);
             if (slot.isEmpty()) {
-                this.inventory.set(i, stack.copy());
-                this.setChanged();
-                return;
-            }
-            if (net.minecraft.world.item.ItemStack.isSameItemSameTags(slot, stack) && slot.getCount() + stack.getCount() <= slot.getMaxStackSize()) {
-                slot.grow(stack.getCount());
+                this.inventory.set(i, remaining.copy());
                 this.setChanged();
                 return;
             }

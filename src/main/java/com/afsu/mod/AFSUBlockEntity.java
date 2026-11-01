@@ -71,6 +71,14 @@ public class AFSUBlockEntity extends DirectionalEnergyStorageTileEntity implemen
     }
 
     @Override
+    public void onTick() {
+        super.onTick();
+        if (this.hasLevel() && !this.level.isClientSide && this.clock(128)) {
+            this.setChanged();
+        }
+    }
+
+    @Override
     public List<Component> getDiagnostics() {
         List<Component> diag = new ArrayList<>();
         diag.add(Component.literal("[Energy]: " + this.getStoredEU() + " / 2110000000 EU").withStyle(net.minecraft.ChatFormatting.GREEN));
