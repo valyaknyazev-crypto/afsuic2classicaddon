@@ -87,14 +87,14 @@ public class ElectricSaberItem extends SwordItem implements IElectricItem {
             if (!worldIn.isClientSide) {
                 nbt.putBoolean("active", false);
             }
-            return InteractionResultHolder.success(stack);
+            return InteractionResultHolder.sidedSuccess(stack, worldIn.isClientSide);
         }
         if (!nbt.getBoolean("active") && ElectricItem.MANAGER.canUse(stack, this.energyPerTick)) {
             if (!worldIn.isClientSide) {
                 nbt.putBoolean("active", true);
                 nbt.putLong("activation_time", worldIn.getGameTime());
             }
-            return InteractionResultHolder.success(stack);
+            return InteractionResultHolder.sidedSuccess(stack, worldIn.isClientSide);
         }
         return InteractionResultHolder.pass(stack);
     }
@@ -110,12 +110,12 @@ public class ElectricSaberItem extends SwordItem implements IElectricItem {
 
     @Override
     public void inventoryTick(ItemStack stack, Level worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
-        if (!worldIn.isClientSide && stack.getOrCreateTag().getBoolean("active")) {
+        if (!worldIn.isClientSide && stack.hasTag() && stack.getTag().getBoolean("active")) {
             if (entityIn instanceof LivingEntity living) {
                 boolean isHeld = isSelected || (living.getOffhandItem() == stack);
                 if (isHeld) {
                     if (!ElectricItem.MANAGER.use(stack, this.energyPerTick, living)) {
-                        stack.getOrCreateTag().putBoolean("active", false);
+                        stack.getTag().putBoolean("active", false);
                     }
                 }
             }
@@ -124,9 +124,9 @@ public class ElectricSaberItem extends SwordItem implements IElectricItem {
 
     @Override
     public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
-        if (stack.getOrCreateTag().getBoolean("active")) {
+        if (stack.hasTag() && stack.getTag().getBoolean("active")) {
             if (!ElectricItem.MANAGER.use(stack, this.energyPerHit, attacker)) {
-                stack.getOrCreateTag().putBoolean("active", false);
+                stack.getTag().putBoolean("active", false);
             }
         }
         return true;
@@ -135,14 +135,19 @@ public class ElectricSaberItem extends SwordItem implements IElectricItem {
     @Override
     public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot equipmentSlot, ItemStack stack) {
         if (equipmentSlot == EquipmentSlot.MAINHAND) {
-            return stack.getOrCreateTag().getBoolean("active") ? this.activeModifiers : this.inactiveModifiers;
+            boolean active = stack.hasTag() && stack.getTag().getBoolean("active");
+            return active ? this.activeModifiers : this.inactiveModifiers;
         }
         return HashMultimap.create();
     }
 
     @Override
     public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
-        return oldStack.getOrCreateTag().getBoolean("active") != newStack.getOrCreateTag().getBoolean("active") || slotChanged;
+        if (slotChanged) return true;
+        if (oldStack.getItem() != newStack.getItem()) return true;
+        boolean oldActive = oldStack.hasTag() && oldStack.getTag().getBoolean("active");
+        boolean newActive = newStack.hasTag() && newStack.getTag().getBoolean("active");
+        return oldActive != newActive;
     }
 
     @Override

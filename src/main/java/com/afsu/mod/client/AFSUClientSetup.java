@@ -36,19 +36,16 @@ public class AFSUClientSetup {
     }
 
     private static float calculateSaberFrame(net.minecraft.world.item.ItemStack stack, net.minecraft.client.multiplayer.ClientLevel level) {
-        if (!stack.getOrCreateTag().getBoolean("active")) return 0.0F;
-
-        long activationTime = stack.getOrCreateTag().getLong("activation_time");
-        if (activationTime == 0 && level != null) {
-            activationTime = level.getGameTime();
-            stack.getOrCreateTag().putLong("activation_time", activationTime);
-        }
-
+        if (!stack.hasTag() || !stack.getTag().getBoolean("active")) return 0.0F;
         if (level == null) return 0.0F;
 
-        long diff = level.getGameTime() - activationTime;
-        int frame = 0;
+        long activationTime = stack.getTag().getLong("activation_time");
+        if (activationTime <= 0) return 1.0F;
 
+        long diff = level.getGameTime() - activationTime;
+        if (diff < 0) diff = 0;
+
+        int frame;
         if (diff < 27) {
             frame = (int) (diff / 3);
         } else {
